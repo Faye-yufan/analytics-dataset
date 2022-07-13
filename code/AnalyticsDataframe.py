@@ -17,7 +17,7 @@ class AnalyticsDataframe:
         predictor_matrix:  Pandas Dataframe
         ------
         Use numpy.random.rand to Create an array of the given shape and
-        populate it with random samples from a uniform distribution over [0, 1).
+        set the default values to NaN.
 
     """
 
@@ -31,13 +31,14 @@ class AnalyticsDataframe:
         if predictor_names is None and self.p:
             predictor_names = ["X{}".format(x) for x in list(range(1, self.p + 1))]
         self.predictor_names = predictor_names
-        self.predictor_matrix = DataFrame(np.random.rand(self.n, self.p), columns=self.predictor_names)
+        self.predictor_matrix = DataFrame(np.full([self.n, self.p], np.nan), columns=self.predictor_names)  # Use numpy.full to set all values to NaN. Can be replaced
+                                                                                                            # by any other value.
 
         # default response name "Y"
         if response_vector_name is None and self.p:
             response_vector_name = "Y"
         self.response_vector_name = response_vector_name
-        self.response_vector = Series(np.random.rand(self.n), name=self.response_vector_name)
+        self.response_vector = Series(np.full([self.n], np.nan), name=self.response_vector_name)
 
     def update_predictor_normal(self, predictor_name_list: list = None, mean_dict: dict = None,
                                 std_dict: dict = None, correlation_matrix: np.ndarray = None):
@@ -86,43 +87,43 @@ class AnalyticsDataframe:
 
 ad1 = AnalyticsDataframe(100, 5)
 print(ad1.predictor_matrix)
-#           X1        X2        X3        X4        X5
-# 0   0.107469  0.935932  0.623685  0.356701  0.068561
-# 1   0.256083  0.176947  0.664749  0.999356  0.032216
-# 2   0.850852  0.836145  0.177883  0.229526  0.012871
-# 3   0.208060  0.004082  0.842855  0.948733  0.629501
-# 4   0.277969  0.309295  0.499653  0.951978  0.432877
-# ..       ...       ...       ...       ...       ...
-# 95  0.379744  0.849693  0.430577  0.061092  0.583688
-# 96  0.116081  0.539185  0.592007  0.050244  0.320626
-# 97  0.073628  0.928103  0.299621  0.400061  0.065094
-# 98  0.222534  0.555966  0.559410  0.044951  0.016164
-# 99  0.179221  0.532509  0.948731  0.036875  0.282074
-#
+#     X1  X2  X3  X4  X5
+# 0  NaN NaN NaN NaN NaN
+# 1  NaN NaN NaN NaN NaN
+# 2  NaN NaN NaN NaN NaN
+# 3  NaN NaN NaN NaN NaN
+# 4  NaN NaN NaN NaN NaN
+# ..  ..  ..  ..  ..  ..
+# 95 NaN NaN NaN NaN NaN
+# 96 NaN NaN NaN NaN NaN
+# 97 NaN NaN NaN NaN NaN
+# 98 NaN NaN NaN NaN NaN
+# 99 NaN NaN NaN NaN NaN
+# 
 # [100 rows x 5 columns]
 
 print(ad1.response_vector)
-# 0     0.062972
-# 1     0.508997
-# 2     0.091036
-# 3     0.797928
-# 4     0.090736
-#         ...
-# 95    0.114458
-# 96    0.940943
-# 97    0.980038
-# 98    0.955411
-# 99    0.709068
+# 0    NaN
+# 1    NaN
+# 2    NaN
+# 3    NaN
+# 4    NaN
+#       ..
+# 95   NaN
+# 96   NaN
+# 97   NaN
+# 98   NaN
+# 99   NaN
 # Name: Y, Length: 100, dtype: float64
 
 ad2 = AnalyticsDataframe(5, 3, ["xx1", "xx2", "xx3"], "yy")
 print(ad2.predictor_matrix)
-#         xx1       xx2       xx3
-# 0  0.282465  0.268106  0.506306
-# 1  0.654078  0.706370  0.110114
-# 2  0.922589  0.873792  0.071643
-# 3  0.135106  0.297225  0.859028
-# 4  0.894569  0.270150  0.416135
+#    xx1  xx2  xx3
+# 0  NaN  NaN  NaN
+# 1  NaN  NaN  NaN
+# 2  NaN  NaN  NaN
+# 3  NaN  NaN  NaN
+# 4  NaN  NaN  NaN
 
 C = np.array([[1, -0.5, 0.3],
               [-0.5, 1, 0.2],
@@ -133,8 +134,8 @@ ad2.update_predictor_normal(predictor_name_list=["xx1", "xx2", "xx3"],
                             correlation_matrix=C)
 print(ad2.predictor_matrix)
 #         xx1       xx2       xx3
-# 0  1.725309  0.235418  5.750566
-# 1  1.576663 -0.403526  5.401692
-# 2  1.230314  0.544714  5.885972
-# 3  0.295936  0.712885  4.858719
-# 4  1.457847  0.530003  4.571697
+# 0  1.865383  2.218858  6.750145
+# 1  0.562747  1.535777  6.324234
+# 2  1.381225  1.521372  7.069359
+# 3  0.937004  1.359714  5.233999
+# 4  0.853955  1.408445  5.944211
