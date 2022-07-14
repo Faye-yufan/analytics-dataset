@@ -143,7 +143,7 @@ print(test_matrix_1.corr())
 ## Test case 2 - Test handling of variable lists
 ##
 
-ad3 = AnalyticsDataframe(100, 5)
+ad3 = AnalyticsDataframe(100, 3)
 C = np.array([[1, -0.5, 0.3],
               [-0.5, 1, 0.2],
               [0.3, 0.2, 1]])
