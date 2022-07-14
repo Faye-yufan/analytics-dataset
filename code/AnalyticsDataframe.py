@@ -154,6 +154,8 @@ C = np.array([[1, -0.5, 0.3],
 # ad3.update_predictor_normal(predictor_name_list=["xx1", "xx2", "xx3"],
 #                             mean=[1, 2, 5],
 #                             covariance_matrix=C)
+# ...
+# Exception: Please select the following predictors: ['X1', 'X2', 'X3']
 
 
 # Should generate error due to mismatch of shape between covariance and mean
@@ -163,6 +165,8 @@ C = np.array([[1, -0.5, 0.3],
 # ad3.update_predictor_normal(predictor_name_list=["X1", "X2", "X3"],
 #                             mean=[1, 2, 5],
 #                             covariance_matrix=C2)
+# ...
+# ValueError: mean and cov must have same length
 
 
 # Should generate error due to mismatch of shape between predictor and mean
@@ -170,3 +174,5 @@ C = np.array([[1, -0.5, 0.3],
 # ad3.update_predictor_normal(predictor_name_list=["X1", "X2", "X3"],
 #                             mean=[1, 2],
 #                             covariance_matrix=C)
+# ...
+# ValueError: predictor and mean must have same length
