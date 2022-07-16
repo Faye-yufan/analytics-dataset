@@ -47,8 +47,7 @@ class AnalyticsDataframe:
         Update the predictors of the instance to normally distributed.
         ------
         :param predictor_name_list: A list of predictor names in the initial AnalyticsDataframe
-        :param mean: A numpy array or list,
-                        value: mean
+        :param mean: A numpy array or list, containing mean values
         :param covariance_matrix: A symmetric and positive semi-definite N * N matrix,
                                     defines correlation among N variables.
         :return:
@@ -73,3 +72,18 @@ class AnalyticsDataframe:
 
         elif not _is_len_matched(predictor_name_list, mean):
             raise ValueError('predictor and mean must have same length')
+
+    def update_predictor_categorical(self, predictor_name = None,
+                                     category_names: list = None,
+                                     prob_vector: np.array = None):
+        """
+        update_predictor_categorical(self, predictor_name=None, category_names=None, prob_vector=None)
+        Update a predictor with categorical values.
+        -----
+        :param predictor_name: A string that contains the name of the variable to be set
+        :param category_names: A vector of strings that contains names of the different category values
+        :param prob_vector: A vector of numerics of the same length as category_names that specifies the 
+                            probability (frequency) of each category value.
+        :return:
+        """
+        
