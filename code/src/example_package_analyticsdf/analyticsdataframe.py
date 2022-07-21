@@ -1,5 +1,6 @@
 import numpy as np
 from pandas import Series, DataFrame
+from sklearn.utils.extmath import safe_sparse_dot
 
 
 class AnalyticsDataframe:
@@ -29,8 +30,9 @@ class AnalyticsDataframe:
         if predictor_names is None and self.p:
             predictor_names = ["X{}".format(x) for x in list(range(1, self.p + 1))]
         self.predictor_names = predictor_names
-        self.predictor_matrix = DataFrame(np.full([self.n, self.p], np.nan), columns=self.predictor_names)  # Use numpy.full to set all values to NaN. Can be replaced
-                                                                                                            # by any other value.
+        self.predictor_matrix = DataFrame(np.full([self.n, self.p], np.nan),
+                                          columns=self.predictor_names)  # Use numpy.full to set all values to NaN. Can be replaced
+        # by any other value.
 
         # default response name "Y"
         if response_vector_name is None and self.p:
@@ -73,3 +75,25 @@ class AnalyticsDataframe:
 
         elif not _is_len_matched(predictor_name_list, mean):
             raise ValueError('predictor and mean must have same length')
+
+    def generate_response_vector_linear(self, beta: list = None,
+                                        epsilon_variance: float = None,
+                                        predictor_name_list: list = None):
+        """
+        generate_response_vector_linear(self, beta: list = None,
+                                        epsilon_variance: float = None,
+                                        predictor_name_list: list = None):
+        Generates a response vector based on a linear regression generative model
+        ------
+        :param beta: A list, coefficients of the linear model – first coefficient is the intercept
+        :param epsilon_variance: a scalar variance specification
+        :param predictor_name_list: A list of predictor names to be applied with this method
+        :return:
+        """
+
+        eps = epsilon_variance * np.random.randn(self.n)
+        beta = np.array(beta)
+        if not predictor_name_list:
+            predictor_name_list = self.predictor_matrix.columns.values.tolist()
+        self.response_vector = safe_sparse_dot(self.predictor_matrix[predictor_name_list],
+                                                   beta[1:].T, dense_output=True) + beta[0] + eps
