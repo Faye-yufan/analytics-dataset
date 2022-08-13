@@ -91,9 +91,22 @@ class AnalyticsDataframe:
         :return:
         """
 
-        eps = epsilon_variance * np.random.randn(self.n)
-        beta = np.array(beta)
-        if not predictor_name_list:
-            predictor_name_list = self.predictor_matrix.columns.values.tolist()
-        self.response_vector = safe_sparse_dot(self.predictor_matrix[predictor_name_list],
-                                                   beta[1:].T, dense_output=True) + beta[0] + eps
+        def _is_subset_list(user_input, input_name, actual_list):
+            if not set(user_input) <= set(actual_list):
+                raise Exception(f'Please select the following: {actual_list} for {input_name}')
+            return True
+        
+        def _is_len_match_list(list1, list1_name, list2, list2_name):
+            if not len(list1) == len(list2):
+                raise ValueError(f'{list1_name} and {list2_name} must have same length')
+            return True
+
+        col_name = self.predictor_matrix.columns.values.tolist()
+        if _is_subset_list(predictor_name_list, "predictor_name_list", col_name) and \
+            _is_len_match_list(predictor_name_list, "predictor", beta[1:], "beta"):
+            eps = epsilon_variance * np.random.randn(self.n)
+            beta = np.array(beta)
+            if not predictor_name_list:
+                predictor_name_list = self.predictor_matrix.columns.values.tolist()
+            self.response_vector = safe_sparse_dot(self.predictor_matrix[predictor_name_list],
+                                                    beta[1:].T, dense_output=True) + beta[0] + eps
