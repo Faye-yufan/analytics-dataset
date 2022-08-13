@@ -86,4 +86,54 @@ class AnalyticsDataframe:
                             probability (frequency) of each category value.
         :return:
         """
+        ## Create a function to check if the target predictor exists
+        def pred_exists(name):
+            """
+            Check if the target predictor exists.
+            """
+            return name in self.predictor_names
+
+        ## Create a function to check if the number of category names and probabilities equal
+        def catg_prob_match(names, vector):
+            """
+            Check if the number of category names and the length of probability vector equal. 
+            Aiming to ensure each category has its own and only probability.
+            """
+            return len(names) == len(vector)
+
+        ## Create a function to check if the sum of the probabilities is 1
+        def is_sum_one(vector):
+            """
+            Check if the sum of the probabilities is 1.
+            """
+            return sum(vector) == 1
+
+        if pred_exists(predictor_name) and catg_prob_match(category_names, 
+           prob_vector) and is_sum_one(prob_vector):
+            catg_dict = {} # key is 0, 1, 2,...; value is the corresponding category name
+            num = len(category_names)
+            for i in range(num): # i is 0, 1, 2,...
+                catg_dict[i] = category_names[i]
+            self.predictor_matrix[predictor_name] = np.random.choice(
+                                                    a = list(catg_dict.keys()),
+                                                    size = len(self.predictor_matrix[predictor_name]),
+                                                    p = prob_vector)
+            # Convert keys (0, 1, 2,...) to actual categories
+            df = self.predictor_matrix
+            nrow = len(df[predictor_name])                                      
+            for j in range(nrow):
+                # value = self.predictor_matrix[predictor_name][j]
+                # self.predictor_matrix[predictor_name][j] = catg_dict[value]  # Avoid chained indexing
+                value = df.loc[df.index[j], predictor_name]
+                df.loc[df.index[j], predictor_name] = catg_dict[value]
+
+        elif not pred_exists(predictor_name):
+            raise ValueError('Please choose one of the existing predictors!')
+
+        elif not catg_prob_match(category_names, prob_vector):
+            raise ValueError("Probabilities should have the same amount as categories!")
+        
+        elif not is_sum_one(prob_vector):
+            raise ValueError("The sum of probabilities should equal to 1!")
+
         
