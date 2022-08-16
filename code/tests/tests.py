@@ -1,3 +1,5 @@
+import sys
+sys.path.insert(1, '../src')
 import example_package_analyticsdf as ad
 import numpy as np
 
@@ -101,3 +103,12 @@ C = np.array([[1, -0.5, 0.3],
 #                             covariance_matrix=C)
 # ...
 # ValueError: predictor and mean must have same length
+
+#
+# Test case: update_predictor_beta
+#
+# ad2 = ad.AnalyticsDataframe(10000, 3, ["xx1", "xx2", "xx3"], "yy")
+# ad2.update_predictor_beta(predictor_name_list = ["xx1", "xx2"],
+#                           a = [1, 2],
+#                           b = [5, 6])
+# print(ad2.predictor_matrix)

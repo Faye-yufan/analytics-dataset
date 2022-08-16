@@ -73,3 +73,32 @@ class AnalyticsDataframe:
 
         elif not _is_len_matched(predictor_name_list, mean):
             raise ValueError('predictor and mean must have same length')
+
+    def update_predictor_beta(self, a, b, predictor_name_list: list = None):
+        """
+        update_predictor_beta(self, predictor_name_list: list = None, a, b)
+        Update predictor as beta distributed
+        :param predictor_name_list: A list of predictor names in the initial AnalyticsDataframe
+        :param a: float or array_like of floats. Alpha, positive (>0).
+        :param b: float or array_like of floats. Beta, positive (>0).
+        :return:
+        """
+        def _obj_len(obj):
+            if isinstance(obj, float):
+                return 1
+
+            if isinstance(obj, list):
+                return len(obj)
+
+        def _is_valid_param(predictor_name_list, a, b):
+            len_a = _obj_len(a)
+            len_b = _obj_len(b)
+            len_pre = _obj_len(predictor_name_list)
+            return len_a == len_b == len_pre
+
+        # Update predictor data by a and b
+        if _is_valid_param(predictor_name_list, a, b):
+            num_row = len(self.predictor_matrix)
+            pred_nparr = np.random.beta(a, b, (1, num_row, len(predictor_name_list)))
+            pred_pds = pred_nparr.reshape(num_row, len(predictor_name_list))
+            self.predictor_matrix[predictor_name_list] = pred_pds
