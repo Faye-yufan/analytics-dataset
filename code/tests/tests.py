@@ -101,3 +101,12 @@ C = np.array([[1, -0.5, 0.3],
 #                             covariance_matrix=C)
 # ...
 # ValueError: predictor and mean must have same length
+
+
+##
+## Test case - Update categorical values
+##
+# ad2 = AnalyticsDataframe(100, 3, ["xx1", "xx2", "xx3"], "yy")
+# print(ad2.predictor_matrix)
+# ad2.update_predictor_categorical("xx2", ["Red", "Green", "Blue"], [0.2, 0.3, 0.5])
+# print(ad2.predictor_matrix)
