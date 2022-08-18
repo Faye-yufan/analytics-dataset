@@ -1,10 +1,10 @@
 import setuptools
 
 setuptools.setup(name='example_package_analyticsdf',
-                 version='0.0.4',
+                 version='0.0.5',
                  description='An example package of Analytics Dataframe',
                  url='#',
-                 author='Fei',
+                 author='Fei, Eli',
                  install_requires=['numpy','pandas','scipy'],
                  author_email='',
                  packages=setuptools.find_packages(),
