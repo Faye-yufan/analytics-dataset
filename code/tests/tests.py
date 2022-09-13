@@ -1,3 +1,5 @@
+import sys
+sys.path.insert(1, '../src')
 import example_package_analyticsdf as ad
 import numpy as np
 
@@ -102,6 +104,23 @@ C = np.array([[1, -0.5, 0.3],
 # ...
 # ValueError: predictor and mean must have same length
 
+#
+# Test case - update predictor normal
+#
+ad2 = ad.AnalyticsDataframe(5, 3, ["xx1", "xx2", "xx3"], "yy")
+ad2 = ad.AnalyticsDataframe(10000, 3, ["xx1", "xx2", "xx3"], "yy")
+C = np.array([[1, -0.5, 0.3],
+              [-0.5, 1, 0.2],
+              [0.3, 0.2, 1]])
+ad2.update_predictor_normal(predictor_name_list=["xx1", "xx2", "xx3"],
+                            mean=[1, 2, 5],
+                            covariance_matrix=C)
+print(ad2.response_vector)
+beta = [5, 1, 2, 3]
+eps_var = 1
+pred_list = ["xx1", "xx2", "xx3"]
+ad2.generate_response_vector_linear(beta, eps_var, pred_list)
+print(ad2.response_vector)
 
 ##
 ## Test case - Update categorical values
