@@ -105,7 +105,7 @@ C = np.array([[1, -0.5, 0.3],
 # ValueError: predictor and mean must have same length
 
 #
-# Test case 
+# Test case - update predictor normal
 #
 ad2 = ad.AnalyticsDataframe(5, 3, ["xx1", "xx2", "xx3"], "yy")
 ad2 = ad.AnalyticsDataframe(10000, 3, ["xx1", "xx2", "xx3"], "yy")
@@ -121,3 +121,11 @@ eps_var = 1
 pred_list = ["xx1", "xx2", "xx3"]
 ad2.generate_response_vector_linear(beta, eps_var, pred_list)
 print(ad2.response_vector)
+
+##
+## Test case - Update categorical values
+##
+# ad2 = AnalyticsDataframe(100, 3, ["xx1", "xx2", "xx3"], "yy")
+# print(ad2.predictor_matrix)
+# ad2.update_predictor_categorical("xx2", ["Red", "Green", "Blue"], [0.2, 0.3, 0.5])
+# print(ad2.predictor_matrix)
