@@ -1,6 +1,7 @@
 import numpy as np
 from pandas import Series, DataFrame
 from sklearn.utils.extmath import safe_sparse_dot
+from itertools import combinations
 
 
 class AnalyticsDataframe:
@@ -173,3 +174,76 @@ class AnalyticsDataframe:
                 predictor_name_list = self.predictor_matrix.columns.values.tolist()
             self.response_vector = safe_sparse_dot(self.predictor_matrix[predictor_name_list],
                                                     beta[1:].T, dense_output=True) + beta[0] + eps
+
+    def generate_response_vector_polynomial(self, predictor_name_list: list,
+                                            polynomial_order: list,
+                                            beta: list,
+                                            interaction_term_betas: np.array,
+                                            epsilon_variance: float):
+        # Generates a response vector based on a linear regression generative model that contains 
+        # polynomial terms for one or more of the predictors and interaction terms
+        
+        # predictor_names:  an array of strings that contains names of the different variables.  
+        # Must be one less than the length of the beta_vector. 
+        
+        # polynomial_order:  an array of integers that specify the order of the polynomial for each predictor with 
+        # legal values of 1 to 4.  Must be the same length as the predictor_names array.
+        
+        # beta_vector:  an array of the betas (coefficients of the linear model) 
+        #   – First coefficient is the intercept 
+        #   – Next  coefficients ( are the coefficients of the  polynomial terms for the first predictor (as specified in the polynomial_order array)
+        #   – Continuing in this manner for all the predictors specified in the predictor_names parameter
+        #   - Array length must equal the sum of the values in the polynomial_order array plus one
+        
+        # interaction_term_betas:  a lower triangular matrix with both dimensions equal to the sum of the 
+        # polynomial_order array containing the betas of any interaction terms
+        
+        # epsilon_variance:  a scalar variance specification
+        def _is_subset_list(user_input, input_name, actual_list):
+            if not set(user_input) <= set(actual_list):
+                raise Exception(f'Please select the following: {actual_list} for {input_name}')
+            return True
+        
+        def _is_len_match_list(list1, list1_name, list2, list2_name):
+            if not len(list1) == len(list2):
+                raise ValueError(f'{list1_name} and {list2_name} must have same length')
+            return True
+        
+        def _valid_input(predictor_name_list, polynomial_order, beta, 
+                        interaction_term_betas):
+            col_name = self.predictor_matrix.columns.values.tolist()
+            cond1 = _is_subset_list(predictor_name_list, "predictor_name_list", col_name)
+            cond2 = _is_len_match_list(predictor_name_list, "predictor", polynomial_order, "polynomial_order")
+            cond3 = _is_len_match_list(interaction_term_betas, "interaction beta row", interaction_term_betas, "interaction beta column")
+            if len(beta) != sum(polynomial_order) + 1:
+                raise ValueError(f'length of beta must equal to length of polynomial_order plus one')
+                return False
+            return cond1 and cond2 and cond3
+        
+        if _valid_input(predictor_name_list, polynomial_order, beta, 
+                        interaction_term_betas):
+            eps = epsilon_variance * np.random.randn(self.n)
+            beta = np.array(beta)
+
+            # add polynomial term            
+            poly_terms = DataFrame()
+            for i in range(len(predictor_name_list)):
+                pred_name = predictor_name_list[i]
+                for j in range(1, polynomial_order[i] + 1):
+                    col_name = pred_name + "^" + str(j)
+                    poly_terms[col_name] = self.predictor_matrix[pred_name] ** j
+
+            # add interaction terms
+            interact_terms = DataFrame()
+            for c1, c2 in combinations(poly_terms.columns, 2):
+                interact_terms['{0}*{1}'.format(c1,c2)] = poly_terms[c1] * poly_terms[c2]
+            # iterate interaction term betas
+            interact_betas = []
+            for i in range(1, len(interaction_term_betas)):
+                for j in range(i):
+                    interact_betas.append(interaction_term_betas[i][j])
+            
+            poly_mul_beta = safe_sparse_dot(poly_terms, beta[1:].T, dense_output=True)
+            in_mul_beta = safe_sparse_dot(interact_terms, np.array(interact_betas).T, dense_output=True)
+            self.response_vector = beta[0] + poly_mul_beta + in_mul_beta + eps
+            
