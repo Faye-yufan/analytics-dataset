@@ -14,3 +14,6 @@ Examples include:
   * [MIT Data to AI Lab](https://dai.lids.mit.edu/)
   * [datacebo](https://datacebo.com/)
   * 2016 IEEE conference paper, The Synthetic Data Vault. 
+
+## Public Package
+This repo has published beta packages on both [Pypi](https://pypi.org/project/analyticsdf/) and [Anaconda](https://anaconda.org/faye-yufan/analyticsdf)
