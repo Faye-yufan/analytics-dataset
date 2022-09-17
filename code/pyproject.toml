@@ -1,23 +1,23 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[project]
-name = "example_package_analyticsdf"
-version = "0.0.5"
-authors = [
-  { name="Yufan Fei", email="yufanfei@usc.edu" },
-  { name="Eli Wang", email="eliwangc@gmail.com"}
-]
-description = "A example package for Analytics Dataframe"
-readme = "./README.md"
-license = { file="./LICENSE" }
-requires-python = ">=3.7"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
+[tool.pytest.ini_options]
+addopts = "--cov=analyticsdf"
+testpaths = [
+    "tests",
 ]
 
-[project.urls]
-"Homepage" = "https://github.com/Faye-yufan/analytics-dataset"
+[tool.mypy]
+mypy_path = "src"
+check_untyped_defs = true
+disallow_any_generics = true
+ignore_missing_imports = true
+no_implicit_optional = true
+show_error_codes = true
+strict_equality = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unreachable = true
+warn_unused_configs = true
+no_implicit_reexport = true
