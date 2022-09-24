@@ -3,7 +3,7 @@
 ```
 python3 -m venv test-venv    
 ```
-`test-venv` can be changed to any name you want.
+_test-venv_ can be changed to any name you want.
 Activate the venv:
 ```
 source test-venv/bin/activate
