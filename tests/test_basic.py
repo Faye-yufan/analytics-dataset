@@ -1,5 +1,9 @@
 import pytest
-from analyticsdf.analyticsdataframe import AnalyticsDataframe
+# from analyticsdf.analyticsdataframe import AnalyticsDataframe
+import sys
+sys.path.insert(0, '/Users/eliwang/DataScience/analytics-dataset/src/analyticsdf')
+# sys.path.insert(0, '../src/analyticsdf')
+from analyticsdataframe import AnalyticsDataframe
 import numpy as np
 
 # initiate an AnalyticsDataframe with default name
