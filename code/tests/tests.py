@@ -144,3 +144,5 @@ ad1.generate_response_vector_polynomial(predictor_name_list = ["X1", "X2", "X4"]
 beta = [1.5, 3, -2, 0.5, 2, 0, 0.1],
 interaction_term_betas = int_matrix, epsilon_variance = 5)
 print(ad1.response_vector)
+
+## test
