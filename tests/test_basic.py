@@ -1,12 +1,9 @@
 import pytest
-# from analyticsdf.analyticsdataframe import AnalyticsDataframe
-import sys
-sys.path.insert(0, '/Users/eliwang/DataScience/analytics-dataset/src/analyticsdf')
-# sys.path.insert(0, '../src/analyticsdf')
-from analyticsdataframe import AnalyticsDataframe
+from analyticsdf.analyticsdataframe import AnalyticsDataframe
+
 import numpy as np
 
-# initiate an AnalyticsDataframe with default name
+## Initiate an AnalyticsDataframe with default name
 def test_init():
     adf = AnalyticsDataframe(100, 3)
     assert adf.predictor_matrix.columns.values.tolist() == ["X1", "X2", "X3"]
@@ -18,7 +15,7 @@ def test_specify_predictor_name():
     assert adf.predictor_matrix.columns.values.tolist() == ["xx1", "xx2", "xx3"]
 
 
-# validate statistical properties of generated predictor matrix
+## Validate statistical properties of generated predictor matrix for normal distribution
 def test_update_normal():
     ad = AnalyticsDataframe(10000, 3, ["xx1", "xx2", "xx3"], "yy")
     covariance_matrix = np.array([[1, -0.5, 0.3],
@@ -33,8 +30,8 @@ def test_update_normal():
     assert round(corr_list["xx1"][1], 1) == -0.5
     assert round(corr_list["xx1"][2], 1) == 0.3
 
-## Test handling of variable lists
-def test_predictor_normal_handling():
+## Test handling of variable lists              ###??? What does it mean by 'variable lists'?
+def test_predictor_normal_handling():           ###??? Why don't we put all the update_predictor_normal tests in one function?
     ad = AnalyticsDataframe(100, 3)
     C = np.array([[1, -0.5, 0.3],
                 [-0.5, 1, 0.2],
@@ -58,34 +55,60 @@ def test_predictor_normal_handling():
                                     mean=[1, 2, 5],
                                     covariance_matrix=C)
 
-# # Test case: update_predictor_beta
-# #
-# # ad2 = ad.AnalyticsDataframe(10000, 3, ["xx1", "xx2", "xx3"], "yy")
-# # ad2.update_predictor_beta(predictor_name_list = ["xx1", "xx2"],
-# #                           a = [1, 2],
-# #                           b = [5, 6])
+## Test 'update_predictor_beta'
+def test_update_beta():
+    ad = AnalyticsDataframe(10000, 3, ["xx1", "xx2", "xx3"], "yy")
+    ad.update_predictor_beta(predictor_name_list = ["xx1", "xx2"],
+                            a = [1, 2],
+                            b = [5, 6])
+    pred_matrix = ad.predictor_matrix
+    sample_means = pred_matrix.mean().tolist()[:2]
+    sample_vars = np.var(pred_matrix).tolist()[:2]
+    round_decimals = 2
+    xx1_mean = round((1/(1+5)), round_decimals)
+    xx2_mean = round((2/(2+6)), round_decimals)
+    xx1_var = round((1*5)/(((1+5)**2) * (1+5+1)), round_decimals)
+    xx2_var = round((2*6)/(((2+6)**2) * (2+6+1)), round_decimals)
+    assert np.isnan(pred_matrix['xx3'][0]) # nan is of type <class 'numpy.float64'>, has to use isnan().
+    assert [round(sample_mean, round_decimals) for sample_mean in sample_means] == [xx1_mean, xx2_mean]  # same at 3 decimal points
+    assert [round(sample_var, round_decimals) for sample_var in sample_vars] == [xx1_var, xx2_var]
 
-# # Test case - update predictor normal
-# #
-# ad2 = ad.AnalyticsDataframe(5, 3, ["xx1", "xx2", "xx3"], "yy")
-# ad2 = ad.AnalyticsDataframe(10000, 3, ["xx1", "xx2", "xx3"], "yy")
-# C = np.array([[1, -0.5, 0.3],
-#               [-0.5, 1, 0.2],
-#               [0.3, 0.2, 1]])
-# ad2.update_predictor_normal(predictor_name_list=["xx1", "xx2", "xx3"],
-#                             mean=[1, 2, 5],
-#                             covariance_matrix=C)
-# print(ad2.response_vector)
+
+
+# ## Test 'update_predictor_categorical'
+# def test_update_categorical():
+#     ad = AnalyticsDataframe(1000, 3, ["xx1", "xx2", "xx3"], "yy")
+#     ad.update_predictor_categorical("xx2", ["Red", "Green", "Blue"], [0.2, 0.3, 0.5])
+#     pred_matrix = ad.predictor_matrix
+
+#     # column 'xx2' has all the assigned values (colors)
+#     assert sorted(pred_matrix['xx2'].unique()) == sorted(np.array(["Red", "Green", "Blue"]))
+#     # the probabilities are correct
+#     # assert round(sample pro) = [0.2, 0.3, 0.5]
+
+#     ## Test its error cases
+#     # pred_exists error: predictor name doesn't exist
+#     with pytest.raises(ValueError):
+#         ad.update_predictor_categorical(predictor_name = "Sunny or Cloudy", 
+#                                         category_names = ["Red", "Green", "Blue"], 
+#                                         prob_vector = [0.2, 0.3, 0.5])
+
+#     # catg_prob_match error: #category names and #probabiliteis aren't equal
+#     with pytest.raises(ValueError):
+#         ad.update_predictor_categorical(predictor_name = "xx1", 
+#                                         category_names = ["Red", "Green", "Blue"], 
+#                                         prob_vector = [0.2, 0.3])               
+    
+#     # is_sum_one error: the sum of the probabilities doesn't equal to 1
+#     with pytest.raises(ValueError):
+#         ad.update_predictor_categorical(predictor_name = "xx1", 
+#                                         category_names = ["Red", "Green", "Blue"], 
+#                                         prob_vector = [0.2, 0.3, 0.9])       
+
+
+## Test 'generate_response_vector_linear'
 # beta = [5, 1, 2, 3]
 # eps_var = 1
 # pred_list = ["xx1", "xx2", "xx3"]
 # ad2.generate_response_vector_linear(beta, eps_var, pred_list)
 # print(ad2.response_vector)
-
-# ##
-# ## Test case - Update categorical values
-# ##
-# # ad2 = AnalyticsDataframe(100, 3, ["xx1", "xx2", "xx3"], "yy")
-# # print(ad2.predictor_matrix)
-# # ad2.update_predictor_categorical("xx2", ["Red", "Green", "Blue"], [0.2, 0.3, 0.5])
-# # print(ad2.predictor_matrix)
