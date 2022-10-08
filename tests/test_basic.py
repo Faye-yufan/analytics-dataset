@@ -75,40 +75,64 @@ def test_update_beta():
 
 
 
-# ## Test 'update_predictor_categorical'
-# def test_update_categorical():
-#     ad = AnalyticsDataframe(1000, 3, ["xx1", "xx2", "xx3"], "yy")
-#     ad.update_predictor_categorical("xx2", ["Red", "Green", "Blue"], [0.2, 0.3, 0.5])
-#     pred_matrix = ad.predictor_matrix
+## Test 'update_predictor_categorical'
+def test_update_categorical():
+    ad = AnalyticsDataframe(1000, 3, ["xx1", "xx2", "xx3"], "yy")
+    ad.update_predictor_categorical("xx2", ["Red", "Green", "Blue"], [0.2, 0.3, 0.5])
+    pred_matrix = ad.predictor_matrix
 
-#     # column 'xx2' has all the assigned values (colors)
-#     assert sorted(pred_matrix['xx2'].unique()) == sorted(np.array(["Red", "Green", "Blue"]))
-#     # the probabilities are correct
-#     # assert round(sample pro) = [0.2, 0.3, 0.5]
+    # Test if column 'xx2' has all the assigned values (colors)
+    assert sorted(pred_matrix['xx2'].unique()) == sorted(np.array(["Red", "Green", "Blue"]))
+    # Test if the probabilities are correct
+    prob_red = int(pred_matrix['xx2'].value_counts()['Red']) / 1000      # use int() to convert <numpy.int64>
+    prob_green = int(pred_matrix['xx2'].value_counts()['Green']) / 1000
+    prob_blue = int(pred_matrix['xx2'].value_counts()['Blue']) / 1000
+    probs = [prob_red, prob_green, prob_blue]
+    round_decimals = 1
+    assert [round(prob, round_decimals) for prob in probs] == [0.2, 0.3, 0.5]
 
-#     ## Test its error cases
-#     # pred_exists error: predictor name doesn't exist
-#     with pytest.raises(ValueError):
-#         ad.update_predictor_categorical(predictor_name = "Sunny or Cloudy", 
-#                                         category_names = ["Red", "Green", "Blue"], 
-#                                         prob_vector = [0.2, 0.3, 0.5])
+    ## Test its error cases
+    # pred_exists error: predictor name doesn't exist
+    with pytest.raises(ValueError):
+        ad.update_predictor_categorical(predictor_name = "Sunny or Cloudy", 
+                                        category_names = ["Red", "Green", "Blue"], 
+                                        prob_vector = [0.2, 0.3, 0.5])
 
-#     # catg_prob_match error: #category names and #probabiliteis aren't equal
-#     with pytest.raises(ValueError):
-#         ad.update_predictor_categorical(predictor_name = "xx1", 
-#                                         category_names = ["Red", "Green", "Blue"], 
-#                                         prob_vector = [0.2, 0.3])               
+    # catg_prob_match error: #category names and #probabiliteis aren't equal
+    with pytest.raises(ValueError):
+        ad.update_predictor_categorical(predictor_name = "xx1", 
+                                        category_names = ["Red", "Green", "Blue"], 
+                                        prob_vector = [0.2, 0.3])               
     
-#     # is_sum_one error: the sum of the probabilities doesn't equal to 1
-#     with pytest.raises(ValueError):
-#         ad.update_predictor_categorical(predictor_name = "xx1", 
-#                                         category_names = ["Red", "Green", "Blue"], 
-#                                         prob_vector = [0.2, 0.3, 0.9])       
+    # is_sum_one error: the sum of the probabilities doesn't equal to 1
+    with pytest.raises(ValueError):
+        ad.update_predictor_categorical(predictor_name = "xx1", 
+                                        category_names = ["Red", "Green", "Blue"], 
+                                        prob_vector = [0.2, 0.3, 0.9])       
 
 
 ## Test 'generate_response_vector_linear'
-# beta = [5, 1, 2, 3]
-# eps_var = 1
-# pred_list = ["xx1", "xx2", "xx3"]
-# ad2.generate_response_vector_linear(beta, eps_var, pred_list)
-# print(ad2.response_vector)
+def test_response_linear():
+    # Initialize the dataframe
+    ad = AnalyticsDataframe(1000, 3, ["xx1", "xx2", "xx3"], "yy")
+    # Update predictor 'xx1' to normal distribution
+    variance = np.array([[0.25]])
+    ad.update_predictor_normal(predictor_name_list = ['xx1'], 
+                               mean = [2],
+                               covariance_matrix = variance)
+    # Update predictors 'xx2' and 'xx3' to beta distribution
+    ad.update_predictor_beta(predictor_name_list = ["xx2", "xx3"],
+                             a = [1, 2],
+                             b = [5, 6])
+    # Define parameters
+    beta = [5, 1, 2, 3]
+    eps_var = 1
+    pred_list = ["xx1", "xx2", "xx3"]
+    ad.generate_response_vector_linear(beta, eps_var, pred_list)
+
+    # Test if first row follows the expected linear regression
+    first_row = ad.predictor_matrix.iloc[0, :].tolist() # the first row of 
+    np.random.seed(0)                                   # set the seed to make sure the error is the same as in the response generating function
+    error = float(eps_var * np.random.randn(1))         
+    first_response = beta[0] + beta[1]*first_row[0] + beta[2]*first_row[1] + beta[3]*first_row[2] + error
+    assert round(first_response, 2) == round(float(ad.response_vector[0]), 2)
