@@ -198,6 +198,7 @@ class AnalyticsDataframe:
         col_name = self.predictor_matrix.columns.values.tolist()
         if _is_subset_list(predictor_name_list, "predictor_name_list", col_name) and \
             _is_len_match_list(predictor_name_list, "predictor", beta[1:], "beta"):
+            np.random.seed(0)   # set the random seed to make sure the error in pytest function is the same
             eps = epsilon_variance * np.random.randn(self.n)
             beta = np.array(beta)
             if not predictor_name_list:
