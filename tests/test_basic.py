@@ -54,34 +54,60 @@ def test_predictor_normal_handling():
                                     mean=[1, 2, 5],
                                     covariance_matrix=C)
 
-# # Test case: update_predictor_beta
-# #
-# # ad2 = ad.AnalyticsDataframe(10000, 3, ["xx1", "xx2", "xx3"], "yy")
-# # ad2.update_predictor_beta(predictor_name_list = ["xx1", "xx2"],
-# #                           a = [1, 2],
-# #                           b = [5, 6])
+## Test 'update_predictor_beta'
+def test_update_beta():
+    ad = AnalyticsDataframe(10000, 3, ["xx1", "xx2", "xx3"], "yy")
+    ad.update_predictor_beta(predictor_name_list = ["xx1", "xx2"],
+                            a = [1, 2],
+                            b = [5, 6])
+    pred_matrix = ad.predictor_matrix
+    sample_means = pred_matrix.mean().tolist()[:2]
+    sample_vars = np.var(pred_matrix).tolist()[:2]
+    round_decimals = 2
+    xx1_mean = round((1/(1+5)), round_decimals)
+    xx2_mean = round((2/(2+6)), round_decimals)
+    xx1_var = round((1*5)/(((1+5)**2) * (1+5+1)), round_decimals)
+    xx2_var = round((2*6)/(((2+6)**2) * (2+6+1)), round_decimals)
 
-# # Test case - update predictor normal
-# #
-# ad2 = ad.AnalyticsDataframe(5, 3, ["xx1", "xx2", "xx3"], "yy")
-# ad2 = ad.AnalyticsDataframe(10000, 3, ["xx1", "xx2", "xx3"], "yy")
-# C = np.array([[1, -0.5, 0.3],
-#               [-0.5, 1, 0.2],
-#               [0.3, 0.2, 1]])
-# ad2.update_predictor_normal(predictor_name_list=["xx1", "xx2", "xx3"],
-#                             mean=[1, 2, 5],
-#                             covariance_matrix=C)
-# print(ad2.response_vector)
-# beta = [5, 1, 2, 3]
-# eps_var = 1
-# pred_list = ["xx1", "xx2", "xx3"]
-# ad2.generate_response_vector_linear(beta, eps_var, pred_list)
-# print(ad2.response_vector)
+    tolerance = 0.1                         # because the beta distribution generated has randomness, we allow some deviation from the theoretical value
+    assert np.isnan(pred_matrix['xx3'][0])  # nan is of type <class 'numpy.float64'>, has to use isnan().
+    assert [round(sample_mean, round_decimals) for sample_mean in sample_means] >= [(1 - tolerance) * xx1_mean, (1 - tolerance) * xx2_mean]
+    assert [round(sample_var, round_decimals) for sample_var in sample_vars] >= [(1 - tolerance) * xx1_var, (1 - tolerance) * xx2_var]
+    assert [round(sample_mean, round_decimals) for sample_mean in sample_means] <= [(1 + tolerance) * xx1_mean, (1 + tolerance) * xx2_mean]
+    assert [round(sample_var, round_decimals) for sample_var in sample_vars] <= [(1 + tolerance) * xx1_var, (1 + tolerance) * xx2_var]
 
-# ##
-# ## Test case - Update categorical values
-# ##
-# # ad2 = AnalyticsDataframe(100, 3, ["xx1", "xx2", "xx3"], "yy")
-# # print(ad2.predictor_matrix)
-# # ad2.update_predictor_categorical("xx2", ["Red", "Green", "Blue"], [0.2, 0.3, 0.5])
-# # print(ad2.predictor_matrix)
+
+## Test 'update_predictor_categorical'
+def test_update_categorical():
+    ad = AnalyticsDataframe(1000, 3, ["xx1", "xx2", "xx3"], "yy")
+    ad.update_predictor_categorical("xx2", ["Red", "Green", "Blue"], [0.2, 0.3, 0.5])
+    pred_matrix = ad.predictor_matrix
+
+    # Test if column 'xx2' has all the assigned values (colors)
+    assert sorted(pred_matrix['xx2'].unique()) == sorted(np.array(["Red", "Green", "Blue"]))
+    # Test if the probabilities are correct
+    prob_red = int(pred_matrix['xx2'].value_counts()['Red']) / 1000      # use int() to convert <numpy.int64>
+    prob_green = int(pred_matrix['xx2'].value_counts()['Green']) / 1000
+    prob_blue = int(pred_matrix['xx2'].value_counts()['Blue']) / 1000
+    probs = [prob_red, prob_green, prob_blue]
+    round_decimals = 1
+    assert [round(prob, round_decimals) for prob in probs] == [0.2, 0.3, 0.5]
+
+    ## Test its error cases
+    # pred_exists error: predictor name doesn't exist
+    with pytest.raises(ValueError):
+        ad.update_predictor_categorical(predictor_name = "Sunny or Cloudy", 
+                                        category_names = ["Red", "Green", "Blue"], 
+                                        prob_vector = [0.2, 0.3, 0.5])
+
+    # catg_prob_match error: #category names and #probabiliteis aren't equal
+    with pytest.raises(ValueError):
+        ad.update_predictor_categorical(predictor_name = "xx1", 
+                                        category_names = ["Red", "Green", "Blue"], 
+                                        prob_vector = [0.2, 0.3])               
+    
+    # is_sum_one error: the sum of the probabilities doesn't equal to 1
+    with pytest.raises(ValueError):
+        ad.update_predictor_categorical(predictor_name = "xx1", 
+                                        category_names = ["Red", "Green", "Blue"], 
+                                        prob_vector = [0.2, 0.3, 0.9])       
