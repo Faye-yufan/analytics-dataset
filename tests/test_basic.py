@@ -111,3 +111,40 @@ def test_update_categorical():
         ad.update_predictor_categorical(predictor_name = "xx1", 
                                         category_names = ["Red", "Green", "Blue"], 
                                         prob_vector = [0.2, 0.3, 0.9])       
+
+## Test 'generate_response_vector_linear'
+def test_response_linear():
+    # Initialize the dataframe
+    ad = AnalyticsDataframe(1000, 3, ["xx1", "xx2", "xx3"], "yy")
+    # Update predictor 'xx1' to normal distribution
+    variance = np.array([[0.25]])
+    ad.update_predictor_normal(predictor_name_list = ['xx1'], 
+                               mean = [2],
+                               covariance_matrix = variance)
+    # Update predictors 'xx2' and 'xx3' to beta distribution
+    ad.update_predictor_beta(predictor_name_list = ["xx2", "xx3"],
+                             a = [1, 2],
+                             b = [5, 6])
+    # Define parameters
+    beta = [5, 1, 2, 3]
+    eps_var = 1
+    pred_list = ["xx1", "xx2", "xx3"]
+    ad.generate_response_vector_linear(beta, eps_var, pred_list)
+
+    # Test if first row follows the expected linear regression
+    first_row = ad.predictor_matrix.iloc[0, :].tolist() # the first row of the predicted values
+    error = float(eps_var * np.random.randn(1))         
+    first_response = beta[0] + beta[1]*first_row[0] + beta[2]*first_row[1] + beta[3]*first_row[2] + error
+
+    # Need a better solution than setting high tolerance!
+    tolerance = 0.5
+    assert first_response >= float((1 - tolerance) * ad.response_vector[0])
+    assert first_response <= float((1 + tolerance) * ad.response_vector[0])
+
+    ## Test its error cases
+    # _is_subset_list error: at least one input predictor is not in the data columns
+    with pytest.raises(Exception):
+        ad.generate_response_vector_linear(beta, eps_var,['xx1', 'You got this mate'])
+    # _is_len_match_list error: #input predictors + 1 must equal to #betas
+    with pytest.raises(ValueError):
+        ad.generate_response_vector_linear([5, 1, 2], eps_var, pred_list)
