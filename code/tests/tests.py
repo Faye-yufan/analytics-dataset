@@ -136,3 +136,20 @@ print(ad2.response_vector)
 # print(ad2.predictor_matrix)
 # ad2.update_predictor_categorical("xx2", ["Red", "Green", "Blue"], [0.2, 0.3, 0.5])
 # print(ad2.predictor_matrix)
+
+ad1 = ad.AnalyticsDataframe(100, 5)
+C = np.array([[1, -0.5, 0.3],
+              [-0.5, 1, 0.2],
+              [0.3, 0.2, 1]])
+ad1.update_predictor_normal(predictor_name_list=["X1", "X2", "X4"],
+                            mean=[1, 2, 5],
+                            covariance_matrix=C)
+print(ad1.response_vector)
+int_matrix = np.array([[0,0,0,0,0,0], [-0.5,0,0,0,0,0], [0,0,0,0,0,0], [0,0,0,0,0,0], [0,0,0,0,0,0], 
+[0,-3,0,0,0,0]])
+ad1.generate_response_vector_polynomial(predictor_name_list = ["X1", "X2", "X4"], polynomial_order = [1,2,3], 
+beta = [1.5, 3, -2, 0.5, 2, 0, 0.1],
+interaction_term_betas = int_matrix, epsilon_variance = 5)
+print(ad1.response_vector)
+
+## test
