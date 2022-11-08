@@ -1,3 +1,4 @@
+import random
 import pytest
 from analyticsdf.analyticsdataframe import AnalyticsDataframe
 import numpy as np
@@ -35,6 +36,7 @@ def test_predictor_normal_handling():
     C = np.array([[1, -0.5, 0.3],
                 [-0.5, 1, 0.2],
                 [0.3, 0.2, 1]])
+    
     with pytest.raises(Exception):
         ad.update_predictor_normal(predictor_name_list=["xx1", "xx2", "xx3"],
                             mean=[1, 2, 5],
@@ -129,7 +131,7 @@ def test_response_linear():
     beta = [5, 1, 2, 3]
     eps_var = 1
     pred_list = ["xx1", "xx2", "xx3"]
-    ad.generate_response_vector_linear(beta, eps_var, pred_list)
+    ad.generate_response_vector_linear(beta=beta, epsilon_variance=eps_var, predictor_name_list=pred_list)
 
     # Test if first row follows the expected linear regression
     first_row = ad.predictor_matrix.iloc[0, :].tolist() # the first row of the predicted values
@@ -144,7 +146,59 @@ def test_response_linear():
     ## Test its error cases
     # _is_subset_list error: at least one input predictor is not in the data columns
     with pytest.raises(Exception):
-        ad.generate_response_vector_linear(beta, eps_var,['xx1', 'You got this mate'])
+        ad.generate_response_vector_linear(beta=beta, epsilon_variance=eps_var, predictor_name_list=['xx1', 'You got this mate'])
     # _is_len_match_list error: #input predictors + 1 must equal to #betas
     with pytest.raises(ValueError):
-        ad.generate_response_vector_linear([5, 1, 2], eps_var, pred_list)
+        ad.generate_response_vector_linear(beta=[5, 1, 2], epsilon_variance=eps_var, predictor_name_list=pred_list)
+
+# Test 'generate_response_vector_polynomial'
+def test_response_polynomial():
+    ad = AnalyticsDataframe(100, 6)
+    C = np.array([[1, -0.5, 0.3],
+                [-0.5, 1, 0.2],
+                [0.3, 0.2, 1]])
+    ad.update_predictor_normal(predictor_name_list=["X1", "X2", "X4"],
+                                mean=[1, 2, 5],
+                                covariance_matrix=C)
+    
+    predictor_name_list = ["X1", "X2", "X4"]
+    polynomial_order = [1, 2, 3]
+    beta = [1.5, 3, -2, 0.5, 2, 0, 0.1]
+    int_matrix = np.array([
+        [0,0,0,0,0,0], 
+        [-0.5,0,0,0,0,0], 
+        [0,0,0,0,0,0], 
+        [0,0,0,0,0,0], 
+        [0,0,0,0,0,0], 
+        [0,-3,0,0,0,0]])
+    eps_var = 1
+
+    ad.generate_response_vector_polynomial(
+                predictor_name_list = predictor_name_list, 
+                polynomial_order = polynomial_order, 
+                beta = beta,
+                interaction_term_betas = int_matrix, 
+                epsilon_variance = eps_var)
+    
+    # Test if a random row follows the expected linear regression
+    i = random.randint(0, 99)
+    row = ad.predictor_matrix.iloc[i, :].tolist() # the first row of the predicted values
+    print(row)
+    error = float(eps_var * np.random.randn(1))         
+    response = beta[0] + beta[1] * row[0] ** 1 + \
+            beta[2] * row[1] ** 1 + beta[3] * row[1] ** 2 + \
+            beta[4] * row[3] ** 1 + beta[5] * row[3] ** 2 + beta[6] * row[3] ** 3 + \
+            int_matrix[1][0] * row[0] * row[1] + int_matrix[5][1] * row[1] * row[3] ** 3 +error
+    print(int_matrix[1][0], int_matrix[5][1])
+
+    # Need a better solution than setting high tolerance!
+    tolerance = 0.5
+    assert (ad.response_vector[i] - error) <= response <= (ad.response_vector[i] + error)
+    
+    with pytest.raises(KeyError):
+        ad.generate_response_vector_polynomial(
+                predictor_name_list = ['xx1', 'You got this mate'], 
+                polynomial_order = polynomial_order, 
+                beta = beta,
+                interaction_term_betas = int_matrix, 
+                epsilon_variance = 1)
