@@ -182,18 +182,17 @@ def test_response_polynomial():
     
     # Test if a random row follows the expected linear regression
     i = random.randint(0, 99)
-    row = ad.predictor_matrix.iloc[i, :].tolist() # the first row of the predicted values
-    print(row)
-    error = float(eps_var * np.random.randn(1))         
-    response = beta[0] + beta[1] * row[0] ** 1 + \
-            beta[2] * row[1] ** 1 + beta[3] * row[1] ** 2 + \
-            beta[4] * row[3] ** 1 + beta[5] * row[3] ** 2 + beta[6] * row[3] ** 3 + \
-            int_matrix[1][0] * row[0] * row[1] + int_matrix[5][1] * row[1] * row[3] ** 3 +error
-    print(int_matrix[1][0], int_matrix[5][1])
+    row = ad.predictor_matrix.iloc[i, :].tolist()
+    x1, x2, x4 = row[0], row[1], row[3]
+    # error = float(eps_var * np.random.randn(1)) 
 
-    # Need a better solution than setting high tolerance!
-    tolerance = 0.5
-    assert (ad.response_vector[i] - error) <= response <= (ad.response_vector[i] + error)
+    response = beta[0] + beta[1] * x1 ** 1 + \
+            beta[2] * x2 ** 1 + beta[3] * x2 ** 2 + \
+            beta[4] * x4 ** 1 + beta[5] * x4 ** 2 + beta[6] * x4 ** 3 + \
+            int_matrix[1][0] * x1 * x2 + int_matrix[5][1] * x2 * x4 ** 3
+
+    tolerance = eps_var
+    assert (ad.response_vector[i] - tolerance) <= response <= (ad.response_vector[i] + tolerance)
     
     with pytest.raises(KeyError):
         ad.generate_response_vector_polynomial(

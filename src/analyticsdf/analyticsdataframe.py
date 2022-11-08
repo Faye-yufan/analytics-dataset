@@ -227,10 +227,11 @@ class AnalyticsDataframe:
         
         # iterate interaction term betas
         interact_betas = []
-        for i in range(1, len(interaction_term_betas)):
-            for j in range(i):
+        for j in range(len(interaction_term_betas) - 1):
+            for i in range(j+1, len(interaction_term_betas)):
                 interact_betas.append(interaction_term_betas[i][j])
+        interact_betas = np.array(interact_betas)
         
         poly_mul_beta = safe_sparse_dot(poly_terms, beta[1:].T, dense_output=True)
-        in_mul_beta = safe_sparse_dot(interact_terms, np.array(interact_betas).T, dense_output=True)
+        in_mul_beta = safe_sparse_dot(interact_terms, interact_betas.T, dense_output=True)
         self.response_vector = beta[0] + poly_mul_beta + in_mul_beta + eps
