@@ -12,8 +12,6 @@ def set_random_state(random_state):
     Args:
         random_state (int or np.random.RandomState):
             The random seed or RandomState.
-        set_model_random_state (function):
-            Function to set the random state on the model.
 
     """
     original_state = np.random.get_state()
@@ -23,8 +21,6 @@ def set_random_state(random_state):
     try:
         yield
     finally:
-        current_random_state = np.random.RandomState()
-        current_random_state.set_state(np.random.get_state())
         np.random.set_state(original_state)
 
 

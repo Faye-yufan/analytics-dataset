@@ -192,7 +192,7 @@ def test_response_polynomial():
             int_matrix[1][0] * x1 * x2 + int_matrix[5][1] * x2 * x4 ** 3
 
     tolerance = eps_var
-    assert (ad.response_vector[i] - tolerance) <= response <= (ad.response_vector[i] + tolerance)
+    assert (ad.response_vector[i] - 3 * tolerance) <= response <= (ad.response_vector[i] + 3 * tolerance)
     
     with pytest.raises(KeyError):
         ad.generate_response_vector_polynomial(
