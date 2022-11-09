@@ -192,7 +192,7 @@ def test_response_polynomial():
             int_matrix[1][0] * x1 * x2 + int_matrix[5][1] * x2 * x4 ** 3
 
     tolerance = eps_var
-    assert (ad.response_vector[i] - tolerance) <= response <= (ad.response_vector[i] + tolerance)
+    assert (ad.response_vector[i] - 3 * tolerance) <= response <= (ad.response_vector[i] + 3 * tolerance)
     
     with pytest.raises(KeyError):
         ad.generate_response_vector_polynomial(
@@ -201,3 +201,22 @@ def test_response_polynomial():
                 beta = beta,
                 interaction_term_betas = int_matrix, 
                 epsilon_variance = 1)
+
+# Test 'set_random_state'
+def test_set_random_state():
+    def generate_ad(seed=None):
+        ad = AnalyticsDataframe(5, 3, ["xx1", "xx2", "xx3"], "yy", seed=seed)
+        covariance_matrix = np.array([[1, -0.5, 0.3],
+                    [-0.5, 1, 0.2],
+                    [0.3, 0.2, 1]])
+        ad.update_predictor_normal(predictor_name_list=["xx1", "xx2", "xx3"],
+                                    mean=[1, 2, 5],
+                                    covariance_matrix=covariance_matrix)
+        return ad
+    ad_1 = generate_ad(seed=2)
+    ad_2 = generate_ad(seed=2)
+    assert ad_1.predictor_matrix.equals(ad_2.predictor_matrix)
+
+    ad_3 = generate_ad()
+    ad_4 = generate_ad()
+    assert not ad_3.predictor_matrix.equals(ad_4.predictor_matrix)
