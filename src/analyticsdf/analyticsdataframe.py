@@ -3,8 +3,7 @@ from pandas import Series, DataFrame
 from sklearn.utils.extmath import safe_sparse_dot
 from itertools import combinations
 
-# from analyticsdf.utils import check_update_normal, check_update_beta, check_response_linear
-from analyticsdf import check_columns_exist
+from analyticsdf import check_columns_exist, set_random_state, validate_random_state
 
 class AnalyticsDataframe:
     """Create a AnalyticsDataframe class.
@@ -30,20 +29,26 @@ class AnalyticsDataframe:
 
     def __init__(self, n, p,
                  predictor_names=None,
-                 response_vector_name=None):
+                 response_vector_name=None,
+                 seed=None):
         self.n = n
         self.p = p
+        self.seed = seed
 
-        if predictor_names is None and self.p:
-            predictor_names = ["X{}".format(x) for x in list(range(1, self.p + 1))]
-        self.predictor_names = predictor_names
-        self.predictor_matrix = DataFrame(np.full([self.n, self.p], np.nan),
-                                          columns=self.predictor_names)  
+        with set_random_state(validate_random_state(self.seed)):
+            if predictor_names is None and self.p:
+                predictor_names = ["X{}".format(x) for x in list(range(1, self.p + 1))]
+            self.predictor_names = predictor_names
+            self.predictor_matrix = DataFrame(np.full([self.n, self.p], np.nan),
+                                            columns=self.predictor_names)  
 
-        if response_vector_name is None and self.p:
-            response_vector_name = "Y"
-        self.response_vector_name = response_vector_name
-        self.response_vector = Series(np.full([self.n], np.nan), name=self.response_vector_name)
+            if response_vector_name is None and self.p:
+                response_vector_name = "Y"
+            self.response_vector_name = response_vector_name
+            self.response_vector = Series(np.full([self.n], np.nan), name=self.response_vector_name)
+        
+        
+
 
     @check_columns_exist
     def update_predictor_normal(self, predictor_name_list: list = None,
@@ -64,11 +69,12 @@ class AnalyticsDataframe:
             ValueError: If mean and cov does not have the same size.
 
         """
-        num_row = len(self.predictor_matrix)
-        self.predictor_matrix[predictor_name_list] = np.random.multivariate_normal(mean,
-                                                                                    covariance_matrix,
-                                                                                    size=num_row,
-                                                                                    check_valid='warn')
+        with set_random_state(validate_random_state(self.seed)):
+            num_row = len(self.predictor_matrix)
+            self.predictor_matrix[predictor_name_list] = np.random.multivariate_normal(mean,
+                                                                                        covariance_matrix,
+                                                                                        size=num_row,
+                                                                                        check_valid='warn')
 
     @check_columns_exist
     def update_predictor_beta(self, predictor_name_list, a, b):
@@ -86,10 +92,11 @@ class AnalyticsDataframe:
             KeyError: If the column does not exists.
 
         """
-        num_row = len(self.predictor_matrix)
-        pred_nparr = np.random.beta(a, b, (1, num_row, len(predictor_name_list)))
-        pred_pds = pred_nparr.reshape(num_row, len(predictor_name_list))
-        self.predictor_matrix[predictor_name_list] = pred_pds
+        with set_random_state(validate_random_state(self.seed)):
+            num_row = len(self.predictor_matrix)
+            pred_nparr = np.random.beta(a, b, (1, num_row, len(predictor_name_list)))
+            pred_pds = pred_nparr.reshape(num_row, len(predictor_name_list))
+            self.predictor_matrix[predictor_name_list] = pred_pds
 
 
     def update_predictor_categorical(self, predictor_name = None,
@@ -120,22 +127,23 @@ class AnalyticsDataframe:
         if len(category_names) != len(prob_vector):
             raise ValueError("Probabilities should have the same amount as categories!")
 
-        catg_dict = {} # key is 0, 1, 2,...; value is the corresponding category name
-        num = len(category_names)
-        for i in range(num): # i is 0, 1, 2,...
-            catg_dict[i] = category_names[i]
-        self.predictor_matrix[predictor_name] = np.random.choice(
-                                                a = list(catg_dict.keys()),
-                                                size = len(self.predictor_matrix[predictor_name]),
-                                                p = prob_vector)
-        # Convert keys (0, 1, 2,...) to actual categories
-        df = self.predictor_matrix
-        nrow = len(df[predictor_name])                                      
-        for j in range(nrow):
-            # value = self.predictor_matrix[predictor_name][j]
-            # self.predictor_matrix[predictor_name][j] = catg_dict[value]  # Avoid chained indexing
-            value = df.loc[df.index[j], predictor_name]
-            df.loc[df.index[j], predictor_name] = catg_dict[value]
+        with set_random_state(validate_random_state(self.seed)):
+            catg_dict = {} # key is 0, 1, 2,...; value is the corresponding category name
+            num = len(category_names)
+            for i in range(num): # i is 0, 1, 2,...
+                catg_dict[i] = category_names[i]
+            self.predictor_matrix[predictor_name] = np.random.choice(
+                                                    a = list(catg_dict.keys()),
+                                                    size = len(self.predictor_matrix[predictor_name]),
+                                                    p = prob_vector)
+            # Convert keys (0, 1, 2,...) to actual categories
+            df = self.predictor_matrix
+            nrow = len(df[predictor_name])                                      
+            for j in range(nrow):
+                # value = self.predictor_matrix[predictor_name][j]
+                # self.predictor_matrix[predictor_name][j] = catg_dict[value]  # Avoid chained indexing
+                value = df.loc[df.index[j], predictor_name]
+                df.loc[df.index[j], predictor_name] = catg_dict[value]
 
 
     @check_columns_exist
@@ -156,12 +164,13 @@ class AnalyticsDataframe:
             KeyError: If the column does not exists.
 
         """
-        eps = epsilon_variance * np.random.randn(self.n)
-        beta = np.array(beta)
-        if not predictor_name_list:
-            predictor_name_list = self.predictor_matrix.columns.values.tolist()
-        self.response_vector = safe_sparse_dot(self.predictor_matrix[predictor_name_list],
-                                                beta[1:].T, dense_output=True) + beta[0] + eps
+        with set_random_state(validate_random_state(self.seed)):
+            eps = epsilon_variance * np.random.randn(self.n)
+            beta = np.array(beta)
+            if not predictor_name_list:
+                predictor_name_list = self.predictor_matrix.columns.values.tolist()
+            self.response_vector = safe_sparse_dot(self.predictor_matrix[predictor_name_list],
+                                                    beta[1:].T, dense_output=True) + beta[0] + eps
 
 
     @check_columns_exist
@@ -196,42 +205,30 @@ class AnalyticsDataframe:
             KeyError: If the column does not exists.
 
         """     
-        def _is_len_match_list(list1, list1_name, list2, list2_name):
-            if not len(list1) == len(list2):
-                raise ValueError(f'{list1_name} and {list2_name} must have same length')
-            return True
-        
-        def _valid_input(predictor_name_list, polynomial_order, beta, 
-                        interaction_term_betas):
-            cond2 = _is_len_match_list(predictor_name_list, "predictor", polynomial_order, "polynomial_order")
-            # cond3 = _is_len_match_list(interaction_term_betas, "interaction beta row", interaction_term_betas, "interaction beta column")
-            if len(beta) != sum(polynomial_order) + 1:
-                raise ValueError(f'length of beta must equal to length of polynomial_order plus one')
-            return cond2
-        
-        eps = epsilon_variance * np.random.randn(self.n)
-        beta = np.array(beta)
+        with set_random_state(validate_random_state(self.seed)):
+            eps = epsilon_variance * np.random.randn(self.n)
+            beta = np.array(beta)
 
-        # add polynomial term            
-        poly_terms = DataFrame()
-        for i in range(len(predictor_name_list)):
-            pred_name = predictor_name_list[i]
-            for j in range(1, polynomial_order[i] + 1):
-                col_name = pred_name + "^" + str(j)
-                poly_terms[col_name] = self.predictor_matrix[pred_name] ** j
+            # add polynomial term            
+            poly_terms = DataFrame()
+            for i in range(len(predictor_name_list)):
+                pred_name = predictor_name_list[i]
+                for j in range(1, polynomial_order[i] + 1):
+                    col_name = pred_name + "^" + str(j)
+                    poly_terms[col_name] = self.predictor_matrix[pred_name] ** j
 
-        # add interaction terms
-        interact_terms = DataFrame()
-        for c1, c2 in combinations(poly_terms.columns, 2):
-            interact_terms['{0}*{1}'.format(c1,c2)] = poly_terms[c1] * poly_terms[c2]
-        
-        # iterate interaction term betas
-        interact_betas = []
-        for j in range(len(interaction_term_betas) - 1):
-            for i in range(j+1, len(interaction_term_betas)):
-                interact_betas.append(interaction_term_betas[i][j])
-        interact_betas = np.array(interact_betas)
-        
-        poly_mul_beta = safe_sparse_dot(poly_terms, beta[1:].T, dense_output=True)
-        in_mul_beta = safe_sparse_dot(interact_terms, interact_betas.T, dense_output=True)
-        self.response_vector = beta[0] + poly_mul_beta + in_mul_beta + eps
+            # add interaction terms
+            interact_terms = DataFrame()
+            for c1, c2 in combinations(poly_terms.columns, 2):
+                interact_terms['{0}*{1}'.format(c1,c2)] = poly_terms[c1] * poly_terms[c2]
+            
+            # iterate interaction term betas
+            interact_betas = []
+            for j in range(len(interaction_term_betas) - 1):
+                for i in range(j+1, len(interaction_term_betas)):
+                    interact_betas.append(interaction_term_betas[i][j])
+            interact_betas = np.array(interact_betas)
+            
+            poly_mul_beta = safe_sparse_dot(poly_terms, beta[1:].T, dense_output=True)
+            in_mul_beta = safe_sparse_dot(interact_terms, interact_betas.T, dense_output=True)
+            self.response_vector = beta[0] + poly_mul_beta + in_mul_beta + eps
