@@ -1,4 +1,4 @@
-## Run test on your local machine
+## Run tests on your local machine
 ### Create a `venv` for testing
 ```
 python3 -m venv test-venv    
