@@ -38,16 +38,20 @@ class AnalyticsDataframe:
         with set_random_state(validate_random_state(self.seed)):
             if predictor_names is None and self.p:
                 predictor_names = ["X{}".format(x) for x in list(range(1, self.p + 1))]
-            self.predictor_names = predictor_names
             self.predictor_matrix = DataFrame(np.full([self.n, self.p], np.nan),
-                                            columns=self.predictor_names)  
+                                            columns=predictor_names)
 
             if response_vector_name is None and self.p:
                 response_vector_name = "Y"
-            self.response_vector_name = response_vector_name
-            self.response_vector = Series(np.full([self.n], np.nan), name=self.response_vector_name)
+            self.response_vector = Series(np.full([self.n], np.nan), name=response_vector_name)
         
-        
+    @property
+    def predictor_names(self):
+        return self.predictor_matrix.columns.values
+    
+    @property
+    def response_vector_name(self):
+        return self.response_vector.name   
 
 
     @check_columns_exist

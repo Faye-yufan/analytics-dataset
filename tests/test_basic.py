@@ -14,6 +14,10 @@ def test_specify_predictor_name():
     adf = AnalyticsDataframe(5, 3, ["xx1", "xx2", "xx3"], "yy")
     assert adf.predictor_matrix.columns.values.tolist() == ["xx1", "xx2", "xx3"]
 
+    adf = AnalyticsDataframe(5, 3)
+    adf.predictor_matrix = adf.predictor_matrix.rename(columns={"X2":"xx2"})
+    assert (adf.predictor_names == adf.predictor_matrix.columns.values).all() and (adf.predictor_names == ['X1', 'xx2', 'X3']).all()
+
 
 # validate statistical properties of generated predictor matrix
 def test_update_normal():
