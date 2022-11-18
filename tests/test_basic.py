@@ -1,6 +1,6 @@
 import random
 import pytest
-from analyticsdf.analyticsdataframe import AnalyticsDataframe
+from example_package_analyticsdf.analyticsdataframe import AnalyticsDataframe
 import numpy as np
 
 # initiate an AnalyticsDataframe with default name
