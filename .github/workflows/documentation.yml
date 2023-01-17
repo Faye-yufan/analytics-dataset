@@ -8,16 +8,15 @@ jobs:
     - uses: actions/checkout@v3
     - name: Install dependencies
       run: |
-        pip install -e .
+        python -m pip install --upgrade pip
         pip install sphinx sphinx_rtd_theme
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Sphinx build
       run: |
-        ls
         sphinx-apidoc -o docs src/analyticsdf
     - name: Make html files
       working-directory: ./docs
       run: |
-        ls
         make html
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
