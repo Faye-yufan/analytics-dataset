@@ -90,7 +90,10 @@
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">analyticsdf</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">analyticsdf package</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#analyticsdf-analyticsdataframe-module">analyticsdf.analyticsdataframe module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-analyticsdf.analyticsdataframe">analyticsdf.analyticsdataframe module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#analyticsdf.analyticsdataframe.AnalyticsDataframe"><code class="docutils literal notranslate"><span class="pre">AnalyticsDataframe</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -166,8 +169,156 @@
             
   <section id="analyticsdf-package">
 <h1>analyticsdf package<a class="headerlink" href="#analyticsdf-package" title="Permalink to this heading">¶</a></h1>
-<section id="analyticsdf-analyticsdataframe-module">
-<h2>analyticsdf.analyticsdataframe module<a class="headerlink" href="#analyticsdf-analyticsdataframe-module" title="Permalink to this heading">¶</a></h2>
+<section id="module-analyticsdf.analyticsdataframe">
+<span id="analyticsdf-analyticsdataframe-module"></span><h2>analyticsdf.analyticsdataframe module<a class="headerlink" href="#module-analyticsdf.analyticsdataframe" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="analyticsdf.analyticsdataframe.AnalyticsDataframe">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">analyticsdf.analyticsdataframe.</span></span><span class="sig-name descname"><span class="pre">AnalyticsDataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predictor_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_vector_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analyticsdf/analyticsdataframe.html#AnalyticsDataframe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#analyticsdf.analyticsdataframe.AnalyticsDataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Create a AnalyticsDataframe class.</p>
+<p>Creates a dataframe class which uses the <code class="docutils literal notranslate"><span class="pre">n</span></code>, <code class="docutils literal notranslate"><span class="pre">p</span></code>, <code class="docutils literal notranslate"><span class="pre">predictor_names</span></code> 
+and <code class="docutils literal notranslate"><span class="pre">response_vector_name</span></code> arguments to initialize a dataframe.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>n:</dt><dd><p>Number of observations.</p>
+</dd>
+<dt>p:</dt><dd><p>Number of predictors.</p>
+</dd>
+<dt>predictor_names:</dt><dd><p>List of strings (default = [<cite>X1</cite>, <cite>X2</cite>, … <cite>Xp</cite>]).</p>
+</dd>
+<dt>response_vector_name:</dt><dd><p>String (default = <cite>Y</cite>).</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>AnalyticsDataframe class:</dt><dd><p>predictor_matrix: a Pandas Dataframe with Nan.
+response_vector:  a Pandas Series with Nan.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="analyticsdf.analyticsdataframe.AnalyticsDataframe.generate_response_vector_linear">
+<span class="sig-name descname"><span class="pre">generate_response_vector_linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictor_name_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon_variance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analyticsdf/analyticsdataframe.html#AnalyticsDataframe.generate_response_vector_linear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#analyticsdf.analyticsdataframe.AnalyticsDataframe.generate_response_vector_linear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a response vector based on a linear regression generative model.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>predictor_name_list:</dt><dd><p>A list of predictor names in the initial AnalyticsDataframe.</p>
+</dd>
+<dt>beta: </dt><dd><p>A list, coefficients of the linear model – first coefficient is the intercept</p>
+</dd>
+<dt>epsilon_variance: </dt><dd><p>A scalar variance specification.</p>
+</dd>
+</dl>
+</dd>
+<dt>Raises:</dt><dd><p>KeyError: If the column does not exists.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="analyticsdf.analyticsdataframe.AnalyticsDataframe.generate_response_vector_polynomial">
+<span class="sig-name descname"><span class="pre">generate_response_vector_polynomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictor_name_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polynomial_order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interaction_term_betas</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon_variance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analyticsdf/analyticsdataframe.html#AnalyticsDataframe.generate_response_vector_polynomial"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#analyticsdf.analyticsdataframe.AnalyticsDataframe.generate_response_vector_polynomial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a response vector based on a linear regression generative model that contains 
+polynomial terms for one or more of the predictors and interaction terms.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>predictor_name_list:</dt><dd><p>A list of predictor names in the initial AnalyticsDataframe.</p>
+</dd>
+<dt>polynomial_order: </dt><dd><p>A list of integers that specify the order of the polynomial for each predictor with legal values of 1 to 4.</p>
+</dd>
+<dt>beta_vector: </dt><dd><dl class="simple">
+<dt>A list of the betas (coefficients of the linear model) </dt><dd><p>– First coefficient is the intercept
+– Next  coefficients ( are the coefficients of the  polynomial terms for the first predictor (as specified in the polynomial_order array)
+– Continuing in this manner for all the predictors specified in the predictor_names parameter
+- Array length must equal the sum of the values in the polynomial_order array plus one</p>
+</dd>
+</dl>
+</dd>
+<dt>interaction_term_betas:  </dt><dd><p>A np.array-like lower triangular matrix with both dimensions equal to the sum of the 
+polynomial_order array containing the betas of any interaction terms</p>
+</dd>
+<dt>epsilon_variance:  </dt><dd><p>A scalar variance specification</p>
+</dd>
+</dl>
+</dd>
+<dt>Raises:</dt><dd><p>KeyError: If the column does not exists.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="analyticsdf.analyticsdataframe.AnalyticsDataframe.predictor_names">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">predictor_names</span></span><a class="headerlink" href="#analyticsdf.analyticsdataframe.AnalyticsDataframe.predictor_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="analyticsdf.analyticsdataframe.AnalyticsDataframe.response_vector_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">response_vector_name</span></span><a class="headerlink" href="#analyticsdf.analyticsdataframe.AnalyticsDataframe.response_vector_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="analyticsdf.analyticsdataframe.AnalyticsDataframe.update_predictor_beta">
+<span class="sig-name descname"><span class="pre">update_predictor_beta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictor_name_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analyticsdf/analyticsdataframe.html#AnalyticsDataframe.update_predictor_beta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#analyticsdf.analyticsdataframe.AnalyticsDataframe.update_predictor_beta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the predictors of the instance as beta distributed.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>predictor_name_list:</dt><dd><p>A list of predictor names in the initial AnalyticsDataframe.</p>
+</dd>
+<dt>a: </dt><dd><p>float or array_like of floats. Alpha, positive (&gt;0).</p>
+</dd>
+<dt>b: </dt><dd><p>float or array_like of floats. Beta, positive (&gt;0).</p>
+</dd>
+</dl>
+</dd>
+<dt>Raises:</dt><dd><p>KeyError: If the column does not exists.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="analyticsdf.analyticsdataframe.AnalyticsDataframe.update_predictor_categorical">
+<span class="sig-name descname"><span class="pre">update_predictor_categorical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictor_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analyticsdf/analyticsdataframe.html#AnalyticsDataframe.update_predictor_categorical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#analyticsdf.analyticsdataframe.AnalyticsDataframe.update_predictor_categorical" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update a predictor with categorical values.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>predictor_name:</dt><dd><p>A predictor name in the initial AnalyticsDataframe.</p>
+</dd>
+<dt>category_names: </dt><dd><p>A vector of strings that contains names of the different category values</p>
+</dd>
+<dt>prob_vector: </dt><dd><p>A vector of numerics of the same length as category_names that specifies the probability (frequency) of each category value.</p>
+</dd>
+</dl>
+</dd>
+<dt>Raises:</dt><dd><p>KeyError: If the column does not exists.
+ValueError: If sum of <code class="docutils literal notranslate"><span class="pre">prob_vector</span></code> not equal to 1.
+ValueError: If length of <code class="docutils literal notranslate"><span class="pre">prob_vector</span></code> not equal to <code class="docutils literal notranslate"><span class="pre">category_names</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="analyticsdf.analyticsdataframe.AnalyticsDataframe.update_predictor_normal">
+<span class="sig-name descname"><span class="pre">update_predictor_normal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictor_name_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariance_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analyticsdf/analyticsdataframe.html#AnalyticsDataframe.update_predictor_normal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#analyticsdf.analyticsdataframe.AnalyticsDataframe.update_predictor_normal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the predictors of the instance to normally distributed.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>predictor_name_list:</dt><dd><p>A list of predictor names in the initial AnalyticsDataframe.</p>
+</dd>
+<dt>mean:</dt><dd><p>A numpy array or list, containing mean values.</p>
+</dd>
+<dt>covariance_matrix:</dt><dd><p>A symmetric and positive semi-definite N * N matrix, defines correlation among N variables.</p>
+</dd>
+</dl>
+</dd>
+<dt>Raises:</dt><dd><p>KeyError: If the column does not exists.
+ValueError: If mean and cov does not have the same size.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 </section>
 

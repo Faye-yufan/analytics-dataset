@@ -1,0 +1,439 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>analyticsdf.analyticsdataframe &mdash; Analyticsdf 0.0.5 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Analyticsdf
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">analyticsdf</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Analyticsdf</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>analyticsdf.analyticsdataframe</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for analyticsdf.analyticsdataframe</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">Series</span><span class="p">,</span> <span class="n">DataFrame</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.extmath</span> <span class="kn">import</span> <span class="n">safe_sparse_dot</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">combinations</span>
+
+<span class="kn">from</span> <span class="nn">analyticsdf</span> <span class="kn">import</span> <span class="n">check_columns_exist</span><span class="p">,</span> <span class="n">set_random_state</span><span class="p">,</span> <span class="n">validate_random_state</span>
+
+<div class="viewcode-block" id="AnalyticsDataframe"><a class="viewcode-back" href="../../analyticsdf.html#analyticsdf.analyticsdataframe.AnalyticsDataframe">[docs]</a><span class="k">class</span> <span class="nc">AnalyticsDataframe</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a AnalyticsDataframe class.</span>
+
+<span class="sd">    Creates a dataframe class which uses the ``n``, ``p``, ``predictor_names`` </span>
+<span class="sd">    and ``response_vector_name`` arguments to initialize a dataframe.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        n:</span>
+<span class="sd">            Number of observations.</span>
+<span class="sd">        p:</span>
+<span class="sd">            Number of predictors.</span>
+<span class="sd">        predictor_names:</span>
+<span class="sd">            List of strings (default = [`X1`, `X2`, … `Xp`]).</span>
+<span class="sd">        response_vector_name:</span>
+<span class="sd">            String (default = `Y`).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        AnalyticsDataframe class:</span>
+<span class="sd">            predictor_matrix: a Pandas Dataframe with Nan.</span>
+<span class="sd">            response_vector:  a Pandas Series with Nan.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span>
+                 <span class="n">predictor_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">response_vector_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
+
+        <span class="k">with</span> <span class="n">set_random_state</span><span class="p">(</span><span class="n">validate_random_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">predictor_names</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">:</span>
+                <span class="n">predictor_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;X</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">predictor_matrix</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">),</span>
+                                            <span class="n">columns</span><span class="o">=</span><span class="n">predictor_names</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">response_vector_name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">:</span>
+                <span class="n">response_vector_name</span> <span class="o">=</span> <span class="s2">&quot;Y&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">response_vector</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="n">response_vector_name</span><span class="p">)</span>
+        
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">predictor_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictor_matrix</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">response_vector_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_vector</span><span class="o">.</span><span class="n">name</span>   
+
+
+<div class="viewcode-block" id="AnalyticsDataframe.update_predictor_normal"><a class="viewcode-back" href="../../analyticsdf.html#analyticsdf.analyticsdataframe.AnalyticsDataframe.update_predictor_normal">[docs]</a>    <span class="nd">@check_columns_exist</span>
+    <span class="k">def</span> <span class="nf">update_predictor_normal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predictor_name_list</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                <span class="n">mean</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                <span class="n">covariance_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the predictors of the instance to normally distributed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            predictor_name_list:</span>
+<span class="sd">                A list of predictor names in the initial AnalyticsDataframe.</span>
+<span class="sd">            mean:</span>
+<span class="sd">                A numpy array or list, containing mean values.</span>
+<span class="sd">            covariance_matrix:</span>
+<span class="sd">                A symmetric and positive semi-definite N * N matrix, defines correlation among N variables.</span>
+<span class="sd">        </span>
+<span class="sd">        Raises:</span>
+<span class="sd">            KeyError: If the column does not exists.</span>
+<span class="sd">            ValueError: If mean and cov does not have the same size.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">set_random_state</span><span class="p">(</span><span class="n">validate_random_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)):</span>
+            <span class="n">num_row</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">predictor_matrix</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">predictor_matrix</span><span class="p">[</span><span class="n">predictor_name_list</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span>
+                                                                                        <span class="n">covariance_matrix</span><span class="p">,</span>
+                                                                                        <span class="n">size</span><span class="o">=</span><span class="n">num_row</span><span class="p">,</span>
+                                                                                        <span class="n">check_valid</span><span class="o">=</span><span class="s1">&#39;warn&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AnalyticsDataframe.update_predictor_beta"><a class="viewcode-back" href="../../analyticsdf.html#analyticsdf.analyticsdataframe.AnalyticsDataframe.update_predictor_beta">[docs]</a>    <span class="nd">@check_columns_exist</span>
+    <span class="k">def</span> <span class="nf">update_predictor_beta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predictor_name_list</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the predictors of the instance as beta distributed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            predictor_name_list:</span>
+<span class="sd">                A list of predictor names in the initial AnalyticsDataframe.</span>
+<span class="sd">            a: </span>
+<span class="sd">                float or array_like of floats. Alpha, positive (&gt;0).</span>
+<span class="sd">            b: </span>
+<span class="sd">                float or array_like of floats. Beta, positive (&gt;0).</span>
+<span class="sd">        </span>
+<span class="sd">        Raises:</span>
+<span class="sd">            KeyError: If the column does not exists.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">set_random_state</span><span class="p">(</span><span class="n">validate_random_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)):</span>
+            <span class="n">num_row</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">predictor_matrix</span><span class="p">)</span>
+            <span class="n">pred_nparr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_row</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">predictor_name_list</span><span class="p">)))</span>
+            <span class="n">pred_pds</span> <span class="o">=</span> <span class="n">pred_nparr</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_row</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">predictor_name_list</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">predictor_matrix</span><span class="p">[</span><span class="n">predictor_name_list</span><span class="p">]</span> <span class="o">=</span> <span class="n">pred_pds</span></div>
+
+
+<div class="viewcode-block" id="AnalyticsDataframe.update_predictor_categorical"><a class="viewcode-back" href="../../analyticsdf.html#analyticsdf.analyticsdataframe.AnalyticsDataframe.update_predictor_categorical">[docs]</a>    <span class="k">def</span> <span class="nf">update_predictor_categorical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predictor_name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                     <span class="n">category_names</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                     <span class="n">prob_vector</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update a predictor with categorical values.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            predictor_name:</span>
+<span class="sd">                A predictor name in the initial AnalyticsDataframe.</span>
+<span class="sd">            category_names: </span>
+<span class="sd">                A vector of strings that contains names of the different category values</span>
+<span class="sd">            prob_vector: </span>
+<span class="sd">                A vector of numerics of the same length as category_names that specifies the probability (frequency) of each category value.</span>
+<span class="sd">        </span>
+<span class="sd">        Raises:</span>
+<span class="sd">            KeyError: If the column does not exists.</span>
+<span class="sd">            ValueError: If sum of ``prob_vector`` not equal to 1.</span>
+<span class="sd">            ValueError: If length of ``prob_vector`` not equal to ``category_names``.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">predictor_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictor_names</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Please choose one of the existing predictors!&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">prob_vector</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The sum of probabilities should equal to 1!&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">category_names</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">prob_vector</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Probabilities should have the same amount as categories!&quot;</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">set_random_state</span><span class="p">(</span><span class="n">validate_random_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)):</span>
+            <span class="n">catg_dict</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># key is 0, 1, 2,...; value is the corresponding category name</span>
+            <span class="n">num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">category_names</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num</span><span class="p">):</span> <span class="c1"># i is 0, 1, 2,...</span>
+                <span class="n">catg_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">category_names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">predictor_matrix</span><span class="p">[</span><span class="n">predictor_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+                                                    <span class="n">a</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">catg_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
+                                                    <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">predictor_matrix</span><span class="p">[</span><span class="n">predictor_name</span><span class="p">]),</span>
+                                                    <span class="n">p</span> <span class="o">=</span> <span class="n">prob_vector</span><span class="p">)</span>
+            <span class="c1"># Convert keys (0, 1, 2,...) to actual categories</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictor_matrix</span>
+            <span class="n">nrow</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">predictor_name</span><span class="p">])</span>                                      
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nrow</span><span class="p">):</span>
+                <span class="c1"># value = self.predictor_matrix[predictor_name][j]</span>
+                <span class="c1"># self.predictor_matrix[predictor_name][j] = catg_dict[value]  # Avoid chained indexing</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">predictor_name</span><span class="p">]</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">predictor_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">catg_dict</span><span class="p">[</span><span class="n">value</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="AnalyticsDataframe.generate_response_vector_linear"><a class="viewcode-back" href="../../analyticsdf.html#analyticsdf.analyticsdataframe.AnalyticsDataframe.generate_response_vector_linear">[docs]</a>    <span class="nd">@check_columns_exist</span>
+    <span class="k">def</span> <span class="nf">generate_response_vector_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predictor_name_list</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+                                        <span class="n">beta</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                        <span class="n">epsilon_variance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates a response vector based on a linear regression generative model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            predictor_name_list:</span>
+<span class="sd">                A list of predictor names in the initial AnalyticsDataframe.</span>
+<span class="sd">            beta: </span>
+<span class="sd">                A list, coefficients of the linear model – first coefficient is the intercept</span>
+<span class="sd">            epsilon_variance: </span>
+<span class="sd">                A scalar variance specification.</span>
+<span class="sd">        </span>
+<span class="sd">        Raises:</span>
+<span class="sd">            KeyError: If the column does not exists.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">set_random_state</span><span class="p">(</span><span class="n">validate_random_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)):</span>
+            <span class="n">eps</span> <span class="o">=</span> <span class="n">epsilon_variance</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+            <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">predictor_name_list</span><span class="p">:</span>
+                <span class="n">predictor_name_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictor_matrix</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">response_vector</span> <span class="o">=</span> <span class="n">safe_sparse_dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">predictor_matrix</span><span class="p">[</span><span class="n">predictor_name_list</span><span class="p">],</span>
+                                                    <span class="n">beta</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">dense_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="n">beta</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">eps</span></div>
+
+
+<div class="viewcode-block" id="AnalyticsDataframe.generate_response_vector_polynomial"><a class="viewcode-back" href="../../analyticsdf.html#analyticsdf.analyticsdataframe.AnalyticsDataframe.generate_response_vector_polynomial">[docs]</a>    <span class="nd">@check_columns_exist</span>
+    <span class="k">def</span> <span class="nf">generate_response_vector_polynomial</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predictor_name_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+                                            <span class="n">polynomial_order</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+                                            <span class="n">beta</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+                                            <span class="n">interaction_term_betas</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span>
+                                            <span class="n">epsilon_variance</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates a response vector based on a linear regression generative model that contains </span>
+<span class="sd">        polynomial terms for one or more of the predictors and interaction terms.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            predictor_name_list:</span>
+<span class="sd">                A list of predictor names in the initial AnalyticsDataframe.</span>
+<span class="sd">            polynomial_order: </span>
+<span class="sd">                A list of integers that specify the order of the polynomial for each predictor with legal values of 1 to 4.</span>
+<span class="sd">            beta_vector: </span>
+<span class="sd">                A list of the betas (coefficients of the linear model) </span>
+<span class="sd">                    – First coefficient is the intercept</span>
+<span class="sd">                    – Next  coefficients ( are the coefficients of the  polynomial terms for the first predictor (as specified in the polynomial_order array)</span>
+<span class="sd">                    – Continuing in this manner for all the predictors specified in the predictor_names parameter</span>
+<span class="sd">                    - Array length must equal the sum of the values in the polynomial_order array plus one</span>
+<span class="sd">            interaction_term_betas:  </span>
+<span class="sd">                A np.array-like lower triangular matrix with both dimensions equal to the sum of the </span>
+<span class="sd">                polynomial_order array containing the betas of any interaction terms</span>
+<span class="sd">        </span>
+<span class="sd">            epsilon_variance:  </span>
+<span class="sd">                A scalar variance specification</span>
+<span class="sd">        </span>
+<span class="sd">        Raises:</span>
+<span class="sd">            KeyError: If the column does not exists.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>     
+        <span class="k">with</span> <span class="n">set_random_state</span><span class="p">(</span><span class="n">validate_random_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)):</span>
+            <span class="n">eps</span> <span class="o">=</span> <span class="n">epsilon_variance</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+            <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+
+            <span class="c1"># add polynomial term            </span>
+            <span class="n">poly_terms</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">predictor_name_list</span><span class="p">)):</span>
+                <span class="n">pred_name</span> <span class="o">=</span> <span class="n">predictor_name_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">polynomial_order</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="n">col_name</span> <span class="o">=</span> <span class="n">pred_name</span> <span class="o">+</span> <span class="s2">&quot;^&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+                    <span class="n">poly_terms</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictor_matrix</span><span class="p">[</span><span class="n">pred_name</span><span class="p">]</span> <span class="o">**</span> <span class="n">j</span>
+
+            <span class="c1"># add interaction terms</span>
+            <span class="n">interact_terms</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">combinations</span><span class="p">(</span><span class="n">poly_terms</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+                <span class="n">interact_terms</span><span class="p">[</span><span class="s1">&#39;</span><span class="si">{0}</span><span class="s1">*</span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span><span class="n">c2</span><span class="p">)]</span> <span class="o">=</span> <span class="n">poly_terms</span><span class="p">[</span><span class="n">c1</span><span class="p">]</span> <span class="o">*</span> <span class="n">poly_terms</span><span class="p">[</span><span class="n">c2</span><span class="p">]</span>
+            
+            <span class="c1"># iterate interaction term betas</span>
+            <span class="n">interact_betas</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">interaction_term_betas</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">interaction_term_betas</span><span class="p">)):</span>
+                    <span class="n">interact_betas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">interaction_term_betas</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">])</span>
+            <span class="n">interact_betas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">interact_betas</span><span class="p">)</span>
+            
+            <span class="n">poly_mul_beta</span> <span class="o">=</span> <span class="n">safe_sparse_dot</span><span class="p">(</span><span class="n">poly_terms</span><span class="p">,</span> <span class="n">beta</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">dense_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">in_mul_beta</span> <span class="o">=</span> <span class="n">safe_sparse_dot</span><span class="p">(</span><span class="n">interact_terms</span><span class="p">,</span> <span class="n">interact_betas</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">dense_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">response_vector</span> <span class="o">=</span> <span class="n">beta</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">poly_mul_beta</span> <span class="o">+</span> <span class="n">in_mul_beta</span> <span class="o">+</span> <span class="n">eps</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2023, Analyticsdf Team.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
