@@ -9,6 +9,8 @@ jobs:
     - name: Install dependencies
       run: |
         pip install sphinx sphinx_rtd_theme
+    - name: Sphinx build
+      run: sphinx-apidoc -o docs src/analyticsdf
     - name: Make html files
       working-directory: ./docs
       run: |
