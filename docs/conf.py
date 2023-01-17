@@ -9,7 +9,7 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath("../src/analyticsdf"))
+sys.path.insert(0, os.path.abspath("../src"))
 
 project = 'Analyticsdf'
 copyright = '2023, Analyticsdf Team'
