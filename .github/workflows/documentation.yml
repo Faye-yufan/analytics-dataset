@@ -1,22 +1,20 @@
 name: Docs
 on: push
+
 jobs:
-  docs:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-      - name: Install dependencies
-        run: |
-          pip install sphinx sphinx_rtd_theme
-      - name: Sphinx build
-        run: |
-          sphinx-apidoc -o docs src/analyticsdf
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/documentation' }}
-        with:
-          publish_branch: gh-pages
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs/_build/html/
-          force_orphan: true
+    - uses: actions/checkout@v3
+    - name: Install dependencies
+      run: |
+        pip install sphinx sphinx_rtd_theme
+    - name: Make html files
+      run: |
+        make html
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/documentation' }}
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: docs/_build/html
