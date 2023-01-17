@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import contextlib
 import random
+from functools import wraps
 
 @contextlib.contextmanager
 def set_random_state(random_state):
@@ -61,7 +62,7 @@ def check_columns_exist(function):
         KeyError: If the column does not exists
 
     """
-
+    @wraps(function)
     def decorated(self, predictor_name_list, *args, **kwargs):
         actual = self.predictor_matrix.columns.values.tolist()
 
