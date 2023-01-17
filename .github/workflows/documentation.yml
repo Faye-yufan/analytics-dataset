@@ -10,6 +10,7 @@ jobs:
       run: |
         pip install sphinx sphinx_rtd_theme
     - name: Make html files
+      working-directory: ./docs
       run: |
         make html
     - name: Deploy
