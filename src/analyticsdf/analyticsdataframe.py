@@ -148,6 +148,13 @@ class AnalyticsDataframe:
                 # self.predictor_matrix[predictor_name][j] = catg_dict[value]  # Avoid chained indexing
                 value = df.loc[df.index[j], predictor_name]
                 df.loc[df.index[j], predictor_name] = catg_dict[value]
+    
+
+    @check_columns_exist
+    def update_predictor_uniform(self, predictor_name = None, lower_bound = None, upper_bound = None):
+        with set_random_state(validate_random_state(self.seed)):
+            num_row = len(self.predictor_matrix)
+            self.predictor_matrix[predictor_name] = np.random.uniform(lower_bound, upper_bound, num_row)
 
 
     @check_columns_exist
