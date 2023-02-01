@@ -1,0 +1,26 @@
+name: Docs
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install sphinx sphinx_rtd_theme
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Sphinx build
+      run: |
+        sphinx-apidoc -o docs src/analyticsdf
+    - name: Make html files
+      working-directory: ./docs
+      run: |
+        make html
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: docs/_build/html
