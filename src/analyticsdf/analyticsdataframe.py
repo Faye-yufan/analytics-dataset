@@ -148,6 +148,27 @@ class AnalyticsDataframe:
                 # self.predictor_matrix[predictor_name][j] = catg_dict[value]  # Avoid chained indexing
                 value = df.loc[df.index[j], predictor_name]
                 df.loc[df.index[j], predictor_name] = catg_dict[value]
+    
+
+    @check_columns_exist
+    def update_predictor_uniform(self, predictor_name = None, lower_bound = 0, upper_bound = 1.0):
+        """Update a predictor to uniformly distributed.
+
+        Args:
+            predictor_name:
+                String, a predictor name in AnalyticsDataframe object.
+            lower_bound: 
+                float, lower boundary of the output interval. All values generated will be greater than or equal to low. The default value is 0.
+            upper_bound: 
+                float, upper boundary of the output interval. All values generated will be less than or equal to high. The default value is 1.0.
+        
+        Raises:
+            KeyError: If the column does not exists.
+
+        """
+        with set_random_state(validate_random_state(self.seed)):
+            num_row = len(self.predictor_matrix)
+            self.predictor_matrix[predictor_name] = np.random.uniform(lower_bound, upper_bound, num_row)
 
 
     @check_columns_exist

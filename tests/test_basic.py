@@ -82,6 +82,12 @@ def test_update_beta():
     assert [round(sample_mean, round_decimals) for sample_mean in sample_means] <= [(1 + tolerance) * xx1_mean, (1 + tolerance) * xx2_mean]
     assert [round(sample_var, round_decimals) for sample_var in sample_vars] <= [(1 + tolerance) * xx1_var, (1 + tolerance) * xx2_var]
 
+## Test 'update_predictor_uniform'
+def test_update_uniform():
+    ad = AnalyticsDataframe(10000, 3, ["xx1", "xx2", "xx3"], "yy")
+    ad.update_predictor_uniform("xx1", 1, 3)
+    assert np.all(ad.predictor_matrix["xx1"] >= 1)
+    assert np.all(ad.predictor_matrix["xx1"] < 3)
 
 ## Test 'update_predictor_categorical'
 def test_update_categorical():

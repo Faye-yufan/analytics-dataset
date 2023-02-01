@@ -65,8 +65,10 @@ def check_columns_exist(function):
     @wraps(function)
     def decorated(self, predictor_name_list, *args, **kwargs):
         actual = self.predictor_matrix.columns.values.tolist()
-
-        missing = set(predictor_name_list) - set(actual)
+        if isinstance(predictor_name_list, list):
+            missing = set(predictor_name_list) - set(actual)
+        else:
+            missing = set([predictor_name_list]) - set(actual)
         
         if missing:
             raise KeyError(f'The columns {missing} were not found in predictors.')
