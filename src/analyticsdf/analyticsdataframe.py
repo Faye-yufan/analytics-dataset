@@ -291,16 +291,6 @@ class AnalyticsDataframe:
                     'please use `generate_response_vector_polynomial` instead')
         
         with set_random_state(validate_random_state(self.seed)):
-            # use one-hot encoding
-            # categorical_col_names = []
-            # for k, v in betas.items():
-            #     categorical_col_names.append(predictor_name + '_' + k)
-            
-            # categorical_terms = np.copy(self.predictor_matrix[predictor_name])
-            
-            # sort_idx = np.argsort(from_values)
-            # idx = np.searchsorted(from_values,array,sorter = sort_idx)
-            # out = to_values[sort_idx][idx]
             numeric_vals = DataFrame()
             numeric_vals[predictor_name] = np.copy(self.predictor_matrix[predictor_name])
             for i in range(len(numeric_vals[predictor_name])):
