@@ -3,7 +3,7 @@ from pandas import Series, DataFrame
 from sklearn.utils.extmath import safe_sparse_dot
 from itertools import combinations
 
-from analyticsdf import check_columns_exist, set_random_state, validate_random_state, _check_columns_exist
+from analyticsdf import check_columns_exist, set_random_state, validate_random_state, _check_columns_exist, check_is_numeric
 
 class AnalyticsDataframe:
     """Create a AnalyticsDataframe class.
@@ -260,8 +260,16 @@ class AnalyticsDataframe:
         
         Raises:
             KeyError: If the column does not exists.
+            TypeError: If the column is not numeric.
 
         """     
+
+        # check all the predictors are numeric
+        for p in predictor_name_list:
+            if not check_is_numeric(self.predictor_matrix[p]):
+                raise TypeError(f'predictor {p} expected to be numeric '
+                'please use `generate_response_poly_categorical` instead')
+
         with set_random_state(validate_random_state(self.seed)):
             eps = epsilon_variance * np.random.randn(self.n)
             beta = np.array(beta)
@@ -289,3 +297,41 @@ class AnalyticsDataframe:
             poly_mul_beta = safe_sparse_dot(poly_terms, beta[1:].T, dense_output=True)
             in_mul_beta = safe_sparse_dot(interact_terms, interact_betas.T, dense_output=True)
             self.response_vector = beta[0] + poly_mul_beta + in_mul_beta + eps
+
+    def update_response_poly_categorical(self, predictor_name: str = None, betas: dict = None):
+        """Add categorical factor into response in a polynomial manner.
+
+        Args:
+            predictor_name:
+                String, a predictor name in AnalyticsDataframe object.
+            betas: 
+                A dictionary
+                `key`: categorical values in the current predictor
+                `value`: beta value for this categorical type/value
+        
+        Raises:
+            KeyError: If the column does not exists.
+            TypeError: If this is not categorical predictor.
+
+        """
+
+        if predictor_name not in self.predictor_names:
+            raise KeyError('The column {predictor_name} were not found in predictors.')
+
+        if check_is_numeric(self.predictor_matrix[predictor_name]):
+            raise TypeError(f'predictor {predictor_name} expected to be non-numeric '
+                    'please use `generate_response_vector_polynomial` instead')
+        
+        with set_random_state(validate_random_state(self.seed)):
+            numeric_vals = DataFrame()
+            numeric_vals[predictor_name] = np.copy(self.predictor_matrix[predictor_name])
+            for i in range(len(numeric_vals[predictor_name])):
+                cur_key = self.predictor_matrix.loc[i, predictor_name]
+                if cur_key not in betas:
+                    numeric_vals.loc[i, predictor_name] = 0
+                else:
+                    numeric_vals.loc[i, predictor_name] = betas[cur_key]
+            if self.response_vector.isnull().all().all():
+                self.response_vector = numeric_vals[predictor_name]
+            else:
+                self.response_vector += numeric_vals[predictor_name]

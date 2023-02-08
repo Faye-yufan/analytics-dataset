@@ -145,13 +145,10 @@ def test_response_linear():
 
     # Test if first row follows the expected linear regression
     first_row = ad.predictor_matrix.iloc[0, :].tolist() # the first row of the predicted values
-    error = float(eps_var * np.random.randn(1))         
-    first_response = beta[0] + beta[1]*first_row[0] + beta[2]*first_row[1] + beta[3]*first_row[2] + error
+    first_response = beta[0] + beta[1]*first_row[0] + beta[2]*first_row[1] + beta[3]*first_row[2]
 
-    # Need a better solution than setting high tolerance!
-    tolerance = 0.5
-    assert first_response >= float((1 - tolerance) * ad.response_vector[0])
-    assert first_response <= float((1 + tolerance) * ad.response_vector[0])
+    assert first_response + 3 * eps_var >= float(ad.response_vector[0])
+    assert first_response - 3 * eps_var <= float(ad.response_vector[0])
 
     ## Test its error cases
     # _is_subset_list error: at least one input predictor is not in the data columns
@@ -212,17 +209,18 @@ def test_response_polynomial():
                 interaction_term_betas = int_matrix, 
                 epsilon_variance = 1)
 
+def generate_ad(seed=None):
+    ad = AnalyticsDataframe(5, 4, ["xx1", "xx2", "xx3", 'X6'], "yy", seed=seed)
+    covariance_matrix = np.array([[1, -0.5, 0.3],
+                [-0.5, 1, 0.2],
+                [0.3, 0.2, 1]])
+    ad.update_predictor_normal(predictor_name_list=["xx1", "xx2", "xx3"],
+                                mean=[1, 2, 5],
+                                covariance_matrix=covariance_matrix)
+    return ad
+
 # Test 'set_random_state'
 def test_set_random_state():
-    def generate_ad(seed=None):
-        ad = AnalyticsDataframe(5, 3, ["xx1", "xx2", "xx3"], "yy", seed=seed)
-        covariance_matrix = np.array([[1, -0.5, 0.3],
-                    [-0.5, 1, 0.2],
-                    [0.3, 0.2, 1]])
-        ad.update_predictor_normal(predictor_name_list=["xx1", "xx2", "xx3"],
-                                    mean=[1, 2, 5],
-                                    covariance_matrix=covariance_matrix)
-        return ad
     ad_1 = generate_ad(seed=2)
     ad_2 = generate_ad(seed=2)
     assert ad_1.predictor_matrix.equals(ad_2.predictor_matrix)
@@ -241,3 +239,22 @@ def test_multicollinear():
     ad.update_predictor_multicollinear(target_predictor_name = 'xx1', dependent_predictors_list = ['xx2', 'xx3'], beta=beta, epsilon_variance=eps_var)
     assert ad.predictor_matrix['xx1'][0] >= ad.predictor_matrix['xx2'][0] + ad.predictor_matrix['xx3'][0] * 1.5 - 3 * eps_var
     assert ad.predictor_matrix['xx1'][0] <= ad.predictor_matrix['xx2'][0] + ad.predictor_matrix['xx3'][0] * 1.5 + 3 * eps_var
+
+# Test 'update_response_poly_categorical'
+def test_update_response_poly_categorical():
+    ad = AnalyticsDataframe(1000, 6)
+    ad.update_predictor_categorical('X6', ["Red", "Yellow", "Blue"], [0.3, 0.4, 0.3])
+    ad.update_response_poly_categorical(predictor_name='X6', betas={'Red': -2000, 'Blue': 1000})
+    assert np.all(ad.response_vector <= 1000)
+    assert np.all(ad.response_vector >= -2000)
+
+    ad = generate_ad(seed=123)
+    beta = [5, 1, 2, 3]
+    eps_var = 1
+    pred_list = ["xx1", "xx2", "xx3"]
+
+    ad.generate_response_vector_linear(beta=beta, epsilon_variance=eps_var, predictor_name_list=pred_list)
+    ad.update_predictor_categorical('X6', ["Red", "Yellow", "Blue"], [0.3, 0.4, 0.3])
+    ad.update_response_poly_categorical(predictor_name='X6', betas={'Red': -2000, 'Blue': -1700})
+    assert ad.predictor_matrix.loc[1, 'X6'] == 'Red'
+    assert ad.response_vector[1] < -1900

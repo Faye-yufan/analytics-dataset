@@ -1,7 +1,7 @@
 Analytic generation of datasets with specified statistical characteristics.
 
 # Introduction
-analytics-dataset provides a set of functionality to enable the specification and generation of a wide range of datasets with specified statistical characteristics. Specification to include the predictor matrix and the response vector  
+analytics-dataset provides a set of functionality to enable the specification and generation of a wide range of datasets with specified statistical characteristics. Specification to include the predictor matrix and the response vector. Check the [analyticsdf documentation](https://faye-yufan.github.io/analytics-dataset/) for more details.
 Examples include:
 * High correlation and multi-collinearity among predictor variables
 * Interaction effects between variables

@@ -101,3 +101,7 @@ def _check_columns_exist(df, target):
     
     if missing:
         raise KeyError(f'The columns {missing} were not found in predictors.')
+
+
+def check_is_numeric(col):
+    return np.issubdtype(col.dtype, np.number)
