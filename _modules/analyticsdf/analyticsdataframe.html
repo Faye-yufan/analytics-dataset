@@ -73,7 +73,7 @@
 <span class="kn">from</span> <span class="nn">sklearn.utils.extmath</span> <span class="kn">import</span> <span class="n">safe_sparse_dot</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">combinations</span>
 
-<span class="kn">from</span> <span class="nn">analyticsdf</span> <span class="kn">import</span> <span class="n">check_columns_exist</span><span class="p">,</span> <span class="n">set_random_state</span><span class="p">,</span> <span class="n">validate_random_state</span>
+<span class="kn">from</span> <span class="nn">analyticsdf</span> <span class="kn">import</span> <span class="n">check_columns_exist</span><span class="p">,</span> <span class="n">set_random_state</span><span class="p">,</span> <span class="n">validate_random_state</span><span class="p">,</span> <span class="n">check_is_numeric</span>
 
 <div class="viewcode-block" id="AnalyticsDataframe"><a class="viewcode-back" href="../../analyticsdf.html#analyticsdf.analyticsdataframe.AnalyticsDataframe">[docs]</a><span class="k">class</span> <span class="nc">AnalyticsDataframe</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a AnalyticsDataframe class.</span>
@@ -298,8 +298,16 @@
 <span class="sd">        </span>
 <span class="sd">        Raises:</span>
 <span class="sd">            KeyError: If the column does not exists.</span>
+<span class="sd">            TypeError: If the column is not numeric.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>     
+
+        <span class="c1"># check all the predictors are numeric</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">predictor_name_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">check_is_numeric</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">predictor_matrix</span><span class="p">[</span><span class="n">p</span><span class="p">]):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;predictor </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s1"> expected to be numeric &#39;</span>
+                <span class="s1">&#39;please use `generate_response_poly_categorical` instead&#39;</span><span class="p">)</span>
+
         <span class="k">with</span> <span class="n">set_random_state</span><span class="p">(</span><span class="n">validate_random_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)):</span>
             <span class="n">eps</span> <span class="o">=</span> <span class="n">epsilon_variance</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
             <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
@@ -326,7 +334,45 @@
             
             <span class="n">poly_mul_beta</span> <span class="o">=</span> <span class="n">safe_sparse_dot</span><span class="p">(</span><span class="n">poly_terms</span><span class="p">,</span> <span class="n">beta</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">dense_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">in_mul_beta</span> <span class="o">=</span> <span class="n">safe_sparse_dot</span><span class="p">(</span><span class="n">interact_terms</span><span class="p">,</span> <span class="n">interact_betas</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">dense_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">response_vector</span> <span class="o">=</span> <span class="n">beta</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">poly_mul_beta</span> <span class="o">+</span> <span class="n">in_mul_beta</span> <span class="o">+</span> <span class="n">eps</span></div></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">response_vector</span> <span class="o">=</span> <span class="n">beta</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">poly_mul_beta</span> <span class="o">+</span> <span class="n">in_mul_beta</span> <span class="o">+</span> <span class="n">eps</span></div>
+
+<div class="viewcode-block" id="AnalyticsDataframe.update_response_poly_categorical"><a class="viewcode-back" href="../../analyticsdf.html#analyticsdf.analyticsdataframe.AnalyticsDataframe.update_response_poly_categorical">[docs]</a>    <span class="k">def</span> <span class="nf">update_response_poly_categorical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predictor_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">betas</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add categorical factor into response in a polynomial manner.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            predictor_name:</span>
+<span class="sd">                String, a predictor name in AnalyticsDataframe object.</span>
+<span class="sd">            betas: </span>
+<span class="sd">                A dictionary</span>
+<span class="sd">                `key`: categorical values in the current predictor</span>
+<span class="sd">                `value`: beta value for this categorical type/value</span>
+<span class="sd">        </span>
+<span class="sd">        Raises:</span>
+<span class="sd">            KeyError: If the column does not exists.</span>
+<span class="sd">            TypeError: If this is not categorical predictor.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">predictor_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictor_names</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;The column </span><span class="si">{predictor_name}</span><span class="s1"> were not found in predictors.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">check_is_numeric</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">predictor_matrix</span><span class="p">[</span><span class="n">predictor_name</span><span class="p">]):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;predictor </span><span class="si">{</span><span class="n">predictor_name</span><span class="si">}</span><span class="s1"> expected to be non-numeric &#39;</span>
+                    <span class="s1">&#39;please use `generate_response_vector_polynomial` instead&#39;</span><span class="p">)</span>
+        
+        <span class="k">with</span> <span class="n">set_random_state</span><span class="p">(</span><span class="n">validate_random_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)):</span>
+            <span class="n">numeric_vals</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">()</span>
+            <span class="n">numeric_vals</span><span class="p">[</span><span class="n">predictor_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">predictor_matrix</span><span class="p">[</span><span class="n">predictor_name</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">numeric_vals</span><span class="p">[</span><span class="n">predictor_name</span><span class="p">])):</span>
+                <span class="n">cur_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictor_matrix</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">predictor_name</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">cur_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">betas</span><span class="p">:</span>
+                    <span class="n">numeric_vals</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">predictor_name</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">numeric_vals</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">predictor_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">betas</span><span class="p">[</span><span class="n">cur_key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_vector</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">response_vector</span> <span class="o">=</span> <span class="n">numeric_vals</span><span class="p">[</span><span class="n">predictor_name</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">response_vector</span> <span class="o">+=</span> <span class="n">numeric_vals</span><span class="p">[</span><span class="n">predictor_name</span><span class="p">]</span></div></div>
 </pre></div>
 
            </div>

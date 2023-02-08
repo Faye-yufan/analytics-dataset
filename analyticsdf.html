@@ -154,7 +154,8 @@ polynomial_order array containing the betas of any interaction terms</p>
 </dd>
 </dl>
 </dd>
-<dt>Raises:</dt><dd><p>KeyError: If the column does not exists.</p>
+<dt>Raises:</dt><dd><p>KeyError: If the column does not exists.
+TypeError: If the column is not numeric.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -244,6 +245,26 @@ ValueError: If mean and cov does not have the same size.</p>
 </dl>
 </dd>
 <dt>Raises:</dt><dd><p>KeyError: If the column does not exists.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="analyticsdf.analyticsdataframe.AnalyticsDataframe.update_response_poly_categorical">
+<span class="sig-name descname"><span class="pre">update_response_poly_categorical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictor_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">betas</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analyticsdf/analyticsdataframe.html#AnalyticsDataframe.update_response_poly_categorical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#analyticsdf.analyticsdataframe.AnalyticsDataframe.update_response_poly_categorical" title="Permalink to this definition"></a></dt>
+<dd><p>Add categorical factor into response in a polynomial manner.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>predictor_name:</dt><dd><p>String, a predictor name in AnalyticsDataframe object.</p>
+</dd>
+<dt>betas: </dt><dd><p>A dictionary
+<cite>key</cite>: categorical values in the current predictor
+<cite>value</cite>: beta value for this categorical type/value</p>
+</dd>
+</dl>
+</dd>
+<dt>Raises:</dt><dd><p>KeyError: If the column does not exists.
+TypeError: If this is not categorical predictor.</p>
 </dd>
 </dl>
 </dd></dl>
