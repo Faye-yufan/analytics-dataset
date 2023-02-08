@@ -74,3 +74,7 @@ def check_columns_exist(function):
             raise KeyError(f'The columns {missing} were not found in predictors.')
         return function(self, predictor_name_list, *args, **kwargs)
     return decorated
+
+
+def check_is_numeric(col):
+    return np.issubdtype(col.dtype, np.number)
