@@ -230,3 +230,14 @@ def test_set_random_state():
     ad_3 = generate_ad()
     ad_4 = generate_ad()
     assert not ad_3.predictor_matrix.equals(ad_4.predictor_matrix)
+
+# Test 'update_predictor_multicollinear'
+def test_multicollinear():
+    ad = AnalyticsDataframe(5, 3, ["xx1", "xx2", "xx3"], "yy")
+    ad.update_predictor_uniform("xx2", 1, 3)
+    ad.update_predictor_uniform("xx3", 1, 3)
+    beta = [0, 1, 1.5]
+    eps_var = 1
+    ad.update_predictor_multicollinear(target_predictor_name = 'xx1', dependent_predictors_list = ['xx2', 'xx3'], beta=beta, epsilon_variance=eps_var)
+    assert ad.predictor_matrix['xx1'][0] >= ad.predictor_matrix['xx2'][0] + ad.predictor_matrix['xx3'][0] * 1.5 - 3 * eps_var
+    assert ad.predictor_matrix['xx1'][0] <= ad.predictor_matrix['xx2'][0] + ad.predictor_matrix['xx3'][0] * 1.5 + 3 * eps_var
