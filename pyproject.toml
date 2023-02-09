@@ -21,23 +21,3 @@ warn_return_any = true
 warn_unreachable = true
 warn_unused_configs = true
 no_implicit_reexport = true
-
-
-[project]
-name = "analyticsdf"
-version = "0.0.7"
-authors = [
-  { name="Yufan Fei", email="yufanfei@usc.edu" },
-]
-description = "Analytic generation of datasets with specified statistical characteristics."
-readme = "README.md"
-license = { file="LICENSE" }
-requires-python = ">=3.6"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-]
-
-[project.urls]
-"Homepage" = "https://github.com/Faye-yufan/analytics-dataset"
