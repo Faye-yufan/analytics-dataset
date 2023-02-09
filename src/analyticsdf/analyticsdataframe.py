@@ -3,7 +3,7 @@ from pandas import Series, DataFrame
 from sklearn.utils.extmath import safe_sparse_dot
 from itertools import combinations
 
-from analyticsdf import check_columns_exist, set_random_state, validate_random_state, check_is_numeric
+from analyticsdf import check_columns_exist, set_random_state, validate_random_state, _check_columns_exist, check_is_numeric
 
 class AnalyticsDataframe:
     """Create a AnalyticsDataframe class.
@@ -150,7 +150,6 @@ class AnalyticsDataframe:
                 df.loc[df.index[j], predictor_name] = catg_dict[value]
     
 
-    @check_columns_exist
     def update_predictor_uniform(self, predictor_name = None, lower_bound = 0, upper_bound = 1.0):
         """Update a predictor to uniformly distributed.
 
@@ -166,9 +165,42 @@ class AnalyticsDataframe:
             KeyError: If the column does not exists.
 
         """
+        _check_columns_exist(self.predictor_matrix, predictor_name)
+
         with set_random_state(validate_random_state(self.seed)):
             num_row = len(self.predictor_matrix)
             self.predictor_matrix[predictor_name] = np.random.uniform(lower_bound, upper_bound, num_row)
+
+
+    def update_predictor_multicollinear(self, target_predictor_name = None, dependent_predictors_list = None, 
+                                        beta: list = None,
+                                        epsilon_variance: float = None):
+        """Update the predictor to be multicollinear with other predictors.
+
+        Args:
+            predictor_name:
+                A string of target predictor name in the initial AnalyticsDataframe.
+            dependent_predictors_list:
+                A list of predictor names which selected as dependents.
+            beta: 
+                A list, coefficients of the linear model – first coefficient is the intercept
+            epsilon_variance:
+                A scalar variance specification.
+        
+        Raises:
+            KeyError: If the column does not exists.
+
+        """
+        check_columns = [target_predictor_name] + dependent_predictors_list
+        _check_columns_exist(self.predictor_matrix, check_columns)
+
+        with set_random_state(validate_random_state(self.seed)):
+            eps = epsilon_variance * np.random.randn(self.n)
+            beta = np.array(beta)
+            if not dependent_predictors_list:
+                dependent_predictors_list = self.predictor_matrix.columns.values.tolist()
+            self.predictor_matrix[target_predictor_name] = safe_sparse_dot(self.predictor_matrix[dependent_predictors_list],
+                                                    beta[1:].T, dense_output=True) + beta[0] + eps
 
 
     @check_columns_exist

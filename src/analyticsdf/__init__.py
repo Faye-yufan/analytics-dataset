@@ -76,5 +76,32 @@ def check_columns_exist(function):
     return decorated
 
 
+def _check_columns_exist(df, target):
+    """Raise an exception if the given columns does not exists in dataframe.
+
+    Args:
+        df: 
+            Pandas DataFrame, the data
+        target: 
+            str or list, the columns one may want to check if exists in df
+
+    Raises:
+        KeyError: If the column does not exists
+
+    """
+    missing = []
+    if isinstance(target, list):
+        for c in target:
+            if c in df.columns:
+                continue
+            missing.append(c)
+    else:
+        if target not in df.columns:
+            missing.append(target)
+    
+    if missing:
+        raise KeyError(f'The columns {missing} were not found in predictors.')
+
+
 def check_is_numeric(col):
     return np.issubdtype(col.dtype, np.number)
