@@ -211,6 +211,27 @@ ValueError: If length of <code class="docutils literal notranslate"><span class=
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="analyticsdf.analyticsdataframe.AnalyticsDataframe.update_predictor_multicollinear">
+<span class="sig-name descname"><span class="pre">update_predictor_multicollinear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_predictor_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dependent_predictors_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon_variance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analyticsdf/analyticsdataframe.html#AnalyticsDataframe.update_predictor_multicollinear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#analyticsdf.analyticsdataframe.AnalyticsDataframe.update_predictor_multicollinear" title="Permalink to this definition"></a></dt>
+<dd><p>Update the predictor to be multicollinear with other predictors.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>predictor_name:</dt><dd><p>A string of target predictor name in the initial AnalyticsDataframe.</p>
+</dd>
+<dt>dependent_predictors_list:</dt><dd><p>A list of predictor names which selected as dependents.</p>
+</dd>
+<dt>beta: </dt><dd><p>A list, coefficients of the linear model – first coefficient is the intercept</p>
+</dd>
+<dt>epsilon_variance:</dt><dd><p>A scalar variance specification.</p>
+</dd>
+</dl>
+</dd>
+<dt>Raises:</dt><dd><p>KeyError: If the column does not exists.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="analyticsdf.analyticsdataframe.AnalyticsDataframe.update_predictor_normal">
 <span class="sig-name descname"><span class="pre">update_predictor_normal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictor_name_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariance_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/analyticsdf/analyticsdataframe.html#AnalyticsDataframe.update_predictor_normal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#analyticsdf.analyticsdataframe.AnalyticsDataframe.update_predictor_normal" title="Permalink to this definition"></a></dt>
 <dd><p>Update the predictors of the instance to normally distributed.</p>

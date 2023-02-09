@@ -73,7 +73,7 @@
 <span class="kn">from</span> <span class="nn">sklearn.utils.extmath</span> <span class="kn">import</span> <span class="n">safe_sparse_dot</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">combinations</span>
 
-<span class="kn">from</span> <span class="nn">analyticsdf</span> <span class="kn">import</span> <span class="n">check_columns_exist</span><span class="p">,</span> <span class="n">set_random_state</span><span class="p">,</span> <span class="n">validate_random_state</span><span class="p">,</span> <span class="n">check_is_numeric</span>
+<span class="kn">from</span> <span class="nn">analyticsdf</span> <span class="kn">import</span> <span class="n">check_columns_exist</span><span class="p">,</span> <span class="n">set_random_state</span><span class="p">,</span> <span class="n">validate_random_state</span><span class="p">,</span> <span class="n">_check_columns_exist</span><span class="p">,</span> <span class="n">check_is_numeric</span>
 
 <div class="viewcode-block" id="AnalyticsDataframe"><a class="viewcode-back" href="../../analyticsdf.html#analyticsdf.analyticsdataframe.AnalyticsDataframe">[docs]</a><span class="k">class</span> <span class="nc">AnalyticsDataframe</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a AnalyticsDataframe class.</span>
@@ -220,8 +220,7 @@
                 <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">predictor_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">catg_dict</span><span class="p">[</span><span class="n">value</span><span class="p">]</span></div>
     
 
-<div class="viewcode-block" id="AnalyticsDataframe.update_predictor_uniform"><a class="viewcode-back" href="../../analyticsdf.html#analyticsdf.analyticsdataframe.AnalyticsDataframe.update_predictor_uniform">[docs]</a>    <span class="nd">@check_columns_exist</span>
-    <span class="k">def</span> <span class="nf">update_predictor_uniform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predictor_name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">lower_bound</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">upper_bound</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">):</span>
+<div class="viewcode-block" id="AnalyticsDataframe.update_predictor_uniform"><a class="viewcode-back" href="../../analyticsdf.html#analyticsdf.analyticsdataframe.AnalyticsDataframe.update_predictor_uniform">[docs]</a>    <span class="k">def</span> <span class="nf">update_predictor_uniform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predictor_name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">lower_bound</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">upper_bound</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update a predictor to uniformly distributed.</span>
 
 <span class="sd">        Args:</span>
@@ -236,9 +235,42 @@
 <span class="sd">            KeyError: If the column does not exists.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_check_columns_exist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">predictor_matrix</span><span class="p">,</span> <span class="n">predictor_name</span><span class="p">)</span>
+
         <span class="k">with</span> <span class="n">set_random_state</span><span class="p">(</span><span class="n">validate_random_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)):</span>
             <span class="n">num_row</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">predictor_matrix</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">predictor_matrix</span><span class="p">[</span><span class="n">predictor_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">lower_bound</span><span class="p">,</span> <span class="n">upper_bound</span><span class="p">,</span> <span class="n">num_row</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AnalyticsDataframe.update_predictor_multicollinear"><a class="viewcode-back" href="../../analyticsdf.html#analyticsdf.analyticsdataframe.AnalyticsDataframe.update_predictor_multicollinear">[docs]</a>    <span class="k">def</span> <span class="nf">update_predictor_multicollinear</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_predictor_name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dependent_predictors_list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+                                        <span class="n">beta</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                        <span class="n">epsilon_variance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the predictor to be multicollinear with other predictors.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            predictor_name:</span>
+<span class="sd">                A string of target predictor name in the initial AnalyticsDataframe.</span>
+<span class="sd">            dependent_predictors_list:</span>
+<span class="sd">                A list of predictor names which selected as dependents.</span>
+<span class="sd">            beta: </span>
+<span class="sd">                A list, coefficients of the linear model – first coefficient is the intercept</span>
+<span class="sd">            epsilon_variance:</span>
+<span class="sd">                A scalar variance specification.</span>
+<span class="sd">        </span>
+<span class="sd">        Raises:</span>
+<span class="sd">            KeyError: If the column does not exists.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">check_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">target_predictor_name</span><span class="p">]</span> <span class="o">+</span> <span class="n">dependent_predictors_list</span>
+        <span class="n">_check_columns_exist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">predictor_matrix</span><span class="p">,</span> <span class="n">check_columns</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">set_random_state</span><span class="p">(</span><span class="n">validate_random_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)):</span>
+            <span class="n">eps</span> <span class="o">=</span> <span class="n">epsilon_variance</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+            <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">dependent_predictors_list</span><span class="p">:</span>
+                <span class="n">dependent_predictors_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predictor_matrix</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">predictor_matrix</span><span class="p">[</span><span class="n">target_predictor_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">safe_sparse_dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">predictor_matrix</span><span class="p">[</span><span class="n">dependent_predictors_list</span><span class="p">],</span>
+                                                    <span class="n">beta</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">dense_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="n">beta</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">eps</span></div>
 
 
 <div class="viewcode-block" id="AnalyticsDataframe.generate_response_vector_linear"><a class="viewcode-back" href="../../analyticsdf.html#analyticsdf.analyticsdataframe.AnalyticsDataframe.generate_response_vector_linear">[docs]</a>    <span class="nd">@check_columns_exist</span>
