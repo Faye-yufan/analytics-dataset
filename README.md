@@ -3,7 +3,7 @@
 <br/>
 <p align="center">
 <a href="https://github.com/Faye-yufan/analytics-dataset/">
-<img align="center" width=40% src="/Users/eliwang/DataScience/analytics-dataset/docs/images/autogen-logo.png"></img>
+<img align="center" width=40% src="https://github.com/Faye-yufan/analytics-dataset/blob/edit-readme/docs/images/autogen-logo.png"></img>
 </a>
 </p>
 </div>
