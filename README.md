@@ -3,7 +3,7 @@
 
 [![PyPI Shield](https://img.shields.io/pypi/v/analyticsdf?color=blue)](https://pypi.org/project/analyticsdf/)
 [![Unit Tests](https://github.com/Faye-yufan/analytics-dataset/actions/workflows/unit.yml/badge.svg?branch=main)](https://github.com/Faye-yufan/analytics-dataset/actions/workflows/unit.yml?query=branch%3Amain)
-[![License](https://img.shields.io/github/license/Faye-yufan/analytics-dataset)](https://pypi.python.org/pypi/SDV)
+[![License](https://img.shields.io/github/license/Faye-yufan/analytics-dataset)](https://github.com/Faye-yufan/analytics-dataset/blob/edit-readme/LICENSE)
 
 <div align="center">
 <br/>
