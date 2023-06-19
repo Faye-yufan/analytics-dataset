@@ -9,7 +9,7 @@
 <br/>
 <p align="center">
 <a href="https://github.com/Faye-yufan/analytics-dataset/">
-<img align="center" width=40% src="https://github.com/Faye-yufan/analytics-dataset/blob/edit-readme/docs/images/autogen-logo.png"></img>
+<img align="center" width=40% src="https://github.com/Faye-yufan/analytics-dataset/blob/main/docs/images/autogen-logo.png"></img>
 </a>
 </p>
 </div>
@@ -59,7 +59,7 @@ ad = AnalyticsDataframe(1000, 6)
 ad.predictor_matrix.head()
 ```
 
-![Initialized Predictor Matrix](https://github.com/Faye-yufan/analytics-dataset/blob/edit-readme/docs/images/initialized-predictor-matrix.png)
+![Initialized Predictor Matrix](https://github.com/Faye-yufan/analytics-dataset/blob/main/docs/images/initialized-predictor-matrix.png)
 
 The predictor matrix is initialized with all null values.
 Now let's update the predictors with some distributions:
@@ -70,7 +70,7 @@ for var in ['X1', 'X2', 'X3', 'X4', 'X5']:
 ad.update_predictor_categorical('X6', ["Red", "Yellow", "Blue"], [0.3, 0.4, 0.3])
 ```
 
-![Updated Predictor Matrix](https://github.com/Faye-yufan/analytics-dataset/blob/edit-readme/docs/images/updated-predictor-matrix.png)
+![Updated Predictor Matrix](https://github.com/Faye-yufan/analytics-dataset/blob/main/docs/images/updated-predictor-matrix.png)
 
 Once we have a dataframe desired and would like to visualize it, we can do:
 
@@ -78,7 +78,7 @@ Once we have a dataframe desired and would like to visualize it, we can do:
 df_visualization_bi(ad)
 ```
 
-![Bivariate Visualization Chart](https://github.com/Faye-yufan/analytics-dataset/blob/edit-readme/docs/images/bivariate-vis.png)
+![Bivariate Visualization Chart](https://github.com/Faye-yufan/analytics-dataset/blob/main/docs/images/bivariate-vis.png)
 
 
 # Next Steps
@@ -86,7 +86,7 @@ We plan to integrate an user interface to the library, aiming to let users confi
 
 
 ## Code Contributors
-![Contributors](https://github.com/Faye-yufan/analytics-dataset/blob/edit-readme/docs/images/contributors.png)
+![Contributors](https://github.com/Faye-yufan/analytics-dataset/blob/main/docs/images/contributors.png)
 
 ## License
 AutoGen is released under the MIT License.
