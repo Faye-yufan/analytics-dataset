@@ -258,3 +258,30 @@ def test_update_response_poly_categorical():
     ad.update_response_poly_categorical(predictor_name='X6', betas={'Red': -2000, 'Blue': -1700})
     assert ad.predictor_matrix.loc[1, 'X6'] == 'Red'
     assert ad.response_vector[1] < -1900
+
+def test_predictor_exp():
+    """Test function 'update_predictor_exp'
+    Test logic:
+        The mean of an exponential distribution is also the scale parameter
+        β = 1/λ
+    """
+    ## Initialize and use the function to update
+    ad = AnalyticsDataframe(10000, 3, ["xx1", "xx2", "xx3"], "yy", 666)
+    ad.update_predictor_exp(rate = 1.5,
+                            size = ad.n,
+                            predictor_name = "xx1")
+    pred_matrix = ad.predictor_matrix
+
+    ## Set up groud truth for testing
+    round_decimals = 2
+    exp_mean = round(1/1.5, round_decimals)
+
+    ## Test if the mean of the distribution is 1/λ
+    assert round(np.mean(pred_matrix["xx1"]), round_decimals) == exp_mean
+
+    ## Test its error cases
+    # pred_exists error: predictor name doesn't exist
+    with pytest.raises(KeyError):
+        ad.update_predictor_exp(rate = 1.5,
+                                size = ad.n,
+                                predictor_name = "nonexistent")
