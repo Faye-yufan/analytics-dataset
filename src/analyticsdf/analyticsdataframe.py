@@ -202,6 +202,36 @@ class AnalyticsDataframe:
             self.predictor_matrix[target_predictor_name] = safe_sparse_dot(self.predictor_matrix[dependent_predictors_list],
                                                     beta[1:].T, dense_output=True) + beta[0] + eps
 
+    @check_columns_exist
+    def update_predictor_catg_realistic(self, predictor_name: str = None,
+                                   type: str = None):
+        """Update the predictor with realistic but fake categorical values, given a type, e.g. name, address, etc.
+        
+        Args:
+            predictor_name:
+                String, a target predictor name in the initial AnalyticsDataframe.
+            type:
+                String, the type of category desired, currently support the following:
+                name,
+                address,
+                city,
+                country,
+                company,
+                color (in HEX color code),
+                color_name (in plain English).
+
+        Raises:
+            KeyError: If the column does not exists.
+        """
+        with set_random_state(validate_random_state(self.seed)):
+            from faker import Faker
+            fake = Faker()
+            nrow = self.n
+            new_values = []
+            for _ in range(nrow):
+                value = getattr(fake, type)     # getattr(fake, 'name') == fake.name -> returns the address
+                new_values.append(value())      # fake.name() returns the value
+            self.predictor_matrix[predictor_name] = new_values
 
     @check_columns_exist
     def generate_response_vector_linear(self, predictor_name_list: list = None, 
