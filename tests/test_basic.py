@@ -268,7 +268,6 @@ def test_predictor_exp():
     ## Initialize and use the function to update
     ad = AnalyticsDataframe(10000, 3, ["xx1", "xx2", "xx3"], "yy", 666)
     ad.update_predictor_exp(rate = 1.5,
-                            size = ad.n,
                             predictor_name = "xx1")
     pred_matrix = ad.predictor_matrix
 
@@ -283,5 +282,4 @@ def test_predictor_exp():
     # pred_exists error: predictor name doesn't exist
     with pytest.raises(KeyError):
         ad.update_predictor_exp(rate = 1.5,
-                                size = ad.n,
                                 predictor_name = "nonexistent")

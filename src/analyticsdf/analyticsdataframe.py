@@ -337,7 +337,6 @@ class AnalyticsDataframe:
                 self.response_vector += numeric_vals[predictor_name]
 
     def update_predictor_exp(self, rate: float = None, 
-                             size: tuple = None,
                              predictor_name: list = None):
         """Update a predictor with samples from an exponential distribution.
 
@@ -345,10 +344,6 @@ class AnalyticsDataframe:
             rate:
                 float, must be greater than 0.
                 Lambda(λ). The rate parameter of an exponential distribution.
-            size: 
-                int or tuple of ints, optional
-                Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn.
-                If size is None (default), a single value is returned if scale is a scalar.
             predictor_name: 
                 String, a predictor name in AnalyticsDataframe object.
         
@@ -361,6 +356,7 @@ class AnalyticsDataframe:
 
         with set_random_state(validate_random_state(self.seed)):
             scale = 1/rate      # scale(β) = 1/lambda(λ)
+            size = self.n
             self.predictor_matrix[predictor_name] = np.random.exponential(scale, size)
             
     
