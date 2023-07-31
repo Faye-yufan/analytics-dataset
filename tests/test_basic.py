@@ -261,6 +261,7 @@ def test_update_response_poly_categorical():
 
 def test_catg_realistic():
     """Test function 'update_predictor_catg_realistic'
+
     Test logic:
         length is correct.
         New values are of string format.
@@ -283,3 +284,32 @@ def test_catg_realistic():
     # pred_exists error: predictor name doesn't exist
     with pytest.raises(KeyError):
         ad.update_predictor_catg_realistic("random_name", "name")
+
+def test_date():
+    """Test function 'update_predictor_date'
+
+    Test logic:
+        1. If the date results follow the correct '%Y-%m-%d' format
+        2. If the date results are in the specified date range
+    """
+    ## Initialize and use the function to update
+    ad = AnalyticsDataframe(1000, 3, ["xx1", "xx2", "xx3"], "yy")
+    ad.update_predictor_date("xx1", "2021-07-31", "2022-07-31")
+    pred_matrix = ad.predictor_matrix
+
+    ## Test if the resulted dates follow the format
+    from datetime import datetime
+    import re
+    date_string = pred_matrix.iloc[0, 0].strftime("%Y-%m-%d")
+    pattern = r'^\d{4}-\d{2}-\d{2}$'
+    assert re.match(pattern, date_string) is not None
+    ## Test if the resulted dates are in the range
+    start = datetime.strptime("2021-07-31", "%Y-%m-%d").date()
+    end = datetime.strptime("2022-07-31", "%Y-%m-%d").date()
+    for i in range(1000):
+        assert start <= pred_matrix.iloc[i, 0] <= end
+
+    ## Test its error cases
+    # pred_exists error: predictor name doesn't exist
+    with pytest.raises(KeyError):
+        ad.update_predictor_date("random_name", "2021-07-31", "2022-07-31")
