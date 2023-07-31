@@ -234,6 +234,36 @@ class AnalyticsDataframe:
             self.predictor_matrix[predictor_name] = new_values
 
     @check_columns_exist
+    def update_predictor_date(self, predictor_name: str = None,
+                              from_date: str = None,
+                              to_date: str = None):
+        """Update the predictor with randomly generated dates between two given dates.
+        Args:
+            predictor_name:
+                String, a target predictor name in the initial AnalyticsDataframe.
+            from_date:
+                String, the start of specified date interval. Defaults to 30 years ago.
+            to_date:
+                String, the end of specified date interval. Defaults to 'today'.
+        
+        Raises:
+            KeyError: If the column does not exists.
+        """
+        with set_random_state(validate_random_state(self.seed)):
+            from faker import Faker
+            fake = Faker()
+            nrow = self.n
+            dates = []
+            ## Convert the input dates from strings to datetime
+            from datetime import datetime
+            from_date_object = datetime.strptime(from_date, "%Y-%m-%d")
+            to_date_object = datetime.strptime(to_date, "%Y-%m-%d")
+            for _ in range(nrow):
+                date = getattr(fake, 'date_between')
+                dates.append(date(from_date_object, to_date_object))
+            self.predictor_matrix[predictor_name] = dates
+
+    @check_columns_exist
     def generate_response_vector_linear(self, predictor_name_list: list = None, 
                                         beta: list = None,
                                         epsilon_variance: float = None):
