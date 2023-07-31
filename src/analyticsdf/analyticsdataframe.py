@@ -335,3 +335,28 @@ class AnalyticsDataframe:
                 self.response_vector = numeric_vals[predictor_name]
             else:
                 self.response_vector += numeric_vals[predictor_name]
+
+    def update_predictor_exp(self, rate: float = None, 
+                             predictor_name: list = None):
+        """Update a predictor with samples from an exponential distribution.
+
+        Args:
+            rate:
+                float, must be greater than 0.
+                Lambda(λ). The rate parameter of an exponential distribution.
+            predictor_name: 
+                String, a predictor name in AnalyticsDataframe object.
+        
+        Raises:
+            KeyError: If the column does not exists.
+
+        """
+        ## Check if all target predictors exist
+        _check_columns_exist(self.predictor_matrix, predictor_name)
+
+        with set_random_state(validate_random_state(self.seed)):
+            scale = 1/rate      # scale(β) = 1/lambda(λ)
+            size = self.n
+            self.predictor_matrix[predictor_name] = np.random.exponential(scale, size)
+            
+    
