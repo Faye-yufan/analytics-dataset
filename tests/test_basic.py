@@ -234,6 +234,7 @@ def test_multicollinear():
     ad = AnalyticsDataframe(5, 3, ["xx1", "xx2", "xx3"], "yy")
     ad.update_predictor_uniform("xx2", 1, 3)
     ad.update_predictor_uniform("xx3", 1, 3)
+    ad.update_predictor_beta()
     beta = [0, 1, 1.5]
     eps_var = 1
     ad.update_predictor_multicollinear(target_predictor_name = 'xx1', dependent_predictors_list = ['xx2', 'xx3'], beta=beta, epsilon_variance=eps_var)
@@ -258,3 +259,22 @@ def test_update_response_poly_categorical():
     ad.update_response_poly_categorical(predictor_name='X6', betas={'Red': -2000, 'Blue': -1700})
     assert ad.predictor_matrix.loc[1, 'X6'] == 'Red'
     assert ad.response_vector[1] < -1900
+
+def test_poisson():
+    ad = AnalyticsDataframe(10000, 3, ["xx1", "xx2", "xx3"], "yy")
+    ad.update_predictor_poisson(["xx1","xx2"],lam=3)
+    #Utilized the method of moment and characteristics to make sure 
+    pred_matrix=ad.predictor_matrix
+    #We only take the first two(xx1,xx2) as predictor
+    sample_means_xx1 = pred.matrix.mean().tolist()[0]
+    sample_vars_xx1 = pred.matrix.var().tolist()[0]
+    sample_means_xx2 =pred.matrix.mean().tolist()[1]
+    sample_vars_xx2 = pred.matrix.var().tolist()[1]
+    #Check whether the mean and variance are approximately equal to each other(=lamda)
+    #In real word data, we neeed to consider the tolerance 
+    tolerance = 0.1
+    assert abs(sample_means_xx1 - sample_vars_xx1) <= tolerance
+    assert abs(sample_means_xx2 - sample_vars_xx2) <= tolerance
+
+
+

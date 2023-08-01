@@ -335,3 +335,32 @@ class AnalyticsDataframe:
                 self.response_vector = numeric_vals[predictor_name]
             else:
                 self.response_vector += numeric_vals[predictor_name]
+   
+    def update_predictor_poisson(self,predictor_name=None,lam=1.0):
+        """Update a predictor of the instance as poisson distributed.
+    
+        Args:
+            predictor_name_list:
+                A list of predictor names in the initial AnalyticsDataframe.
+            poisson_lambda:
+                float or array like floats.poisson_lambda,finite positive value(>0)
+            poisson_K:
+                float or array like floats.poisson_K,finite positive value(>=0)
+         Raises:
+            KeyError: If the column does not exists.
+            ValueError: If poisson_lambda is equal or smaller than 0.
+    
+    """ 
+        _check_columns_exist(self.predictor_matrix, predictor_name)
+        if predictor_name not in self.predictor_names:
+            raise KeyError('The column {predictor_name} were not found in predictors.')
+        if lam <= 0:
+            raise ValueError("Lambda (lam) must be a positive value for the Poisson distribution.")
+        with set_random_state(validate_random_state(self.seed)):
+                #Define the row and columns,which is the shape of the new random data
+                num_row = len(self.predictor_matrix)
+                selected_columns = len(self.predictor_matrix[predictor_name])
+                self.predictor_matrix[predictor_name] = np.random.poisson(lam,size=(num_row,selected_columns))
+    
+       
+                                                                                    
