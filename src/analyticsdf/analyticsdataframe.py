@@ -354,26 +354,3 @@ class AnalyticsDataframe:
             for predictor_name in predictor_name_list:
                 self.predictor_matrix[predictor_name] = np.random.binomial(1,prob,size=num_row)
             
-def update_predictor_binomial(self, predictor_name_list,
-                               n,
-                               prob):
-        """Update the predictors of the instance to bernoulli distributed.
-
-        Args:
-            predictor_name_list:
-                A list of predictor names in the initial AnalyticsDataframe.
-            n: 
-                int or array_like of ints, numbers of observations
-            # N: 
-            #     int or array_like of ints, total numbers of trials
-            prob:
-                float or array_like of floats, probability of success
-           
-        Raises:
-            KeyError: If the column does not exists.
-        """
-        with set_random_state(validate_random_state(self.seed)):
-            num_row = len(self.predictor_matrix)
-            for predictor_name in predictor_name_list:
-                self.predictor_matrix[predictor_name] = np.random.binomial(n,prob,size=num_row)
-
