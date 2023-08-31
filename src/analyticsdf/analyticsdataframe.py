@@ -337,15 +337,12 @@ class AnalyticsDataframe:
                 self.response_vector += numeric_vals[predictor_name]
 
     def update_predictor_bernoulli(self, predictor_name_list,
-                               n,
                                prob):
         """Update the predictors of the instance to bernoulli distributed.
 
         Args:
             predictor_name_list:
                 A list of predictor names in the initial AnalyticsDataframe.
-            n: 
-                int or array_like of ints, numbers of observations
             prob:
                 float or array_like of floats, probability of success
            
@@ -354,11 +351,11 @@ class AnalyticsDataframe:
         """
         with set_random_state(validate_random_state(self.seed)):
             num_row = len(self.predictor_matrix)
-            self.predictor_matrix[predictor_name_list] = np.random.binomial(n,prob)
+            for predictor_name in predictor_name_list:
+                self.predictor_matrix[predictor_name] = np.random.binomial(1,prob,size=num_row)
             
 def update_predictor_binomial(self, predictor_name_list,
                                n,
-                               N,
                                prob):
         """Update the predictors of the instance to bernoulli distributed.
 
@@ -367,8 +364,8 @@ def update_predictor_binomial(self, predictor_name_list,
                 A list of predictor names in the initial AnalyticsDataframe.
             n: 
                 int or array_like of ints, numbers of observations
-            N: 
-                int or array_like of ints, total numbers of trials
+            # N: 
+            #     int or array_like of ints, total numbers of trials
             prob:
                 float or array_like of floats, probability of success
            
@@ -377,5 +374,6 @@ def update_predictor_binomial(self, predictor_name_list,
         """
         with set_random_state(validate_random_state(self.seed)):
             num_row = len(self.predictor_matrix)
-            self.predictor_matrix[predictor_name_list] = np.random.binomial(n,prob,size=1)
+            for predictor_name in predictor_name_list:
+                self.predictor_matrix[predictor_name] = np.random.binomial(n,prob,size=num_row)
 
