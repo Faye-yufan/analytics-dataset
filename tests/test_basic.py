@@ -258,3 +258,21 @@ def test_update_response_poly_categorical():
     ad.update_response_poly_categorical(predictor_name='X6', betas={'Red': -2000, 'Blue': -1700})
     assert ad.predictor_matrix.loc[1, 'X6'] == 'Red'
     assert ad.response_vector[1] < -1900
+
+# Test 'update_predictor_bernoulli'
+def test_predictor_bernoulli():
+    """Test function 'update_predictor_bernoulli'
+    Test logic:
+        the mean of a bernoulli distribution is probability prob.
+    """
+    ## Initialize and use the function to update
+    ad = AnalyticsDataframe(10000,3,["xx1","xx2","xx3"],"yy",4)
+    ad.update_predictor_bernoulli(["xx1"], prob=0.4)
+    pred_matrix=ad.predictor_matrix
+
+    ## Set up ground truth for testing
+    round_decimals=2
+    ber_mean=round(0.4, round_decimals)
+
+    ## Test if the mean of the distribution is prob
+    assert round(np.mean(pred_matrix["xx1"]), round_decimals)==ber_mean
